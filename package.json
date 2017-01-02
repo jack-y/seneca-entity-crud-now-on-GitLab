@@ -1,6 +1,6 @@
 {
   "name": "seneca-entity-crud",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "CRUD standard actions on entities",
   "keywords": [
     "node.js",
@@ -10,13 +10,13 @@
     "crud"
   ],
   "dependencies": {
-	"bluebird": "~3.4.6",
+    "bluebird": "~3.4.6",
     "seneca": "^2.1.0",
     "seneca-entity": "^1.3.0"
   },
   "url": "https://www.e-soa.com/",
   "bugs": {
-    "url": "https://www.e-soa.com/",
+    "url": "https://github.com/jack-y/seneca-entity-crud",
     "email": "jdesodt@gmail.com"
   },
   "license": "MIT",
@@ -28,7 +28,7 @@
   "main": "entity-crud.js",
   "repository": {
     "type": "git",
-    "url": "https://www.e-soa.com/"
+    "url": "https://github.com/jack-y/seneca-entity-crud"
   },
   "scripts": {
     "test": "node ./test.js"
