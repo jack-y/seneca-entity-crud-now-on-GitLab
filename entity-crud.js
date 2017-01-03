@@ -31,7 +31,7 @@ module.exports = function (options) {
   seneca.add({role: options.role, cmd: 'read'}, read)
   seneca.add({role: options.role, cmd: 'update', validate: true}, validateAndUpdate)
   seneca.add({role: options.role, cmd: 'update'}, update)
-  seneca.add({role: options.role, cmd: 'delete'}, delet)  // The function 'delete' is already defined in Javascript
+  seneca.add({role: options.role, cmd: 'delete'}, delet)  // The 'delete' function is already defined in Javascript
 
   /* other database actions */
   seneca.add({role: options.role, cmd: 'truncate'}, truncate)
