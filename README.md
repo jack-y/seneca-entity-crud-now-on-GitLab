@@ -115,7 +115,7 @@ seneca
   .use('mem-store')
   .use('seneca-entity-crud', {
     name: 'post',
-    role: 'my_role'
+    role: 'my-role'
   })
 
 /* Promisify seneca actions */
@@ -127,7 +127,7 @@ seneca.ready(function (err) {
 
   /* The create example */
   var myPost = {title: 'A great post', content: 'Hello World'}
-  act({role: 'my_role', cmd: 'create', entity: myPost})
+  act({role: 'my-role', cmd: 'create', entity: myPost})
   .then(function (result) {
     console.log('My great post ID is: ' + result.entity.id)
     return result
@@ -208,7 +208,7 @@ seneca
   .use('mem-store')
   .use('seneca-entity-crud', {
     name: 'post',
-    role: 'my_role'
+    role: 'my-role'
   })
 
 /* Promisify seneca actions */
@@ -232,7 +232,7 @@ seneca.ready(function (err) {
 
   /* The create example without title */
   var myPost = {content: 'Hello World'}
-  act({role: 'my_role', cmd: 'create', entity: myPost, validate: true, validate_function: validatePost})
+  act({role: 'my-role', cmd: 'create', entity: myPost, validate: true, validate_function: validatePost})
   .then(function (result) {
     if (!result.success) {
       console.log('errors: ' + JSON.stringify(result.errors))
@@ -265,7 +265,7 @@ and the message `This message will never be shown.` ...will never be shown ;).
 Use this command to add a new entity into your database. The pattern is:
 
 ```js
-{role: 'my_role', cmd: 'create', entity: newEntity}
+{role: 'my-role', cmd: 'create', entity: newEntity}
 ```
 
 `validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: Input data validation.
@@ -275,7 +275,7 @@ Example:
 ```js
 var myEntity = {title: 'The life of cats', content: '<h1>This is a post about cats</h1><p>Maoww...</p>'}
 // Create
-act({role: 'my_role', cmd: 'create', entity: myEntity)
+act({role: 'my-role', cmd: 'create', entity: myEntity)
 .then(function (result) {
   console.log('My entity ID is: ' + result.entity.id)
   return result
@@ -295,7 +295,7 @@ The result object contains these values:
 Use this command to retrieve an entity from your database. The pattern is:
 
 ```js
-{role: 'my_role', cmd: 'read', id: anId}
+{role: 'my-role', cmd: 'read', id: anId}
 ```
 
 Example:
@@ -303,7 +303,7 @@ Example:
 ```js
 var myId = '5a4732ef4049cfcb07d992007e003932'
 // Read
-act({role: 'my_role', cmd: 'read', id: myId})
+act({role: 'my-role', cmd: 'read', id: myId})
 .then(function (result) {
   console.log('My entity is: ' + JSON.stringify(result.entity))
   return result
@@ -320,7 +320,7 @@ The result object contains these values:
 Use this command to update an entity previously inserted into your database. The pattern is:
 
 ```js
-{role: 'my_role', cmd: 'update', entity: anEntity}
+{role: 'my-role', cmd: 'update', entity: anEntity}
 ```
 
 `validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: Input data validation.
@@ -334,7 +334,7 @@ Example:
 ```js
 var myEntity = {id: '5a4732ef4049cfcb07d992007e003932', title: 'A new title', content: '<h1>This is a post about cats</h1><p>Maoww...</p>'}
 // Update
-act({role: 'my_role', cmd: 'update', entity: myEntity})
+act({role: 'my-role', cmd: 'update', entity: myEntity})
 .then(function (result) {
   console.log('My entity last update is: ' + result.entity.last_update)
   return result
@@ -352,7 +352,7 @@ The result object contains these values:
 Use this command to remove an entity from your database. The pattern is:
 
 ```js
-{role: 'my_role', cmd: 'delete', id: anId}
+{role: 'my-role', cmd: 'delete', id: anId}
 ```
 
 Example:
@@ -360,9 +360,9 @@ Example:
 ```js
 var myId = '5a4732ef4049cfcb07d992007e003932'
 // Delete
-act({role: 'my_role', cmd: 'delete', id: myId})
+act({role: 'my-role', cmd: 'delete', id: myId})
 .then(function (result) {
-  console.log('Id ' + my_id + ' deleted.')
+  console.log('Id ' + myId + ' deleted.')
   return result
 })
 ```
@@ -376,14 +376,14 @@ The result object contains this value:
 Use this command to remove all the entities from your database. The pattern is:
 
 ```js
-{role: 'my_role', cmd: 'truncate'}
+{role: 'my-role', cmd: 'truncate'}
 ```
 
 Example:
 
 ```js
 // Truncate
-act({role: 'my_role', cmd: 'truncate'})
+act({role: 'my-role', cmd: 'truncate'})
 .then(function(result) {
   console.log('No more data. Go home.')
   return result
@@ -401,7 +401,7 @@ The result object contains this value:
 Use this command to retrieve a list of entities from your database. The pattern is:
 
 ```js
-{role: 'my_role', cmd: 'query'}
+{role: 'my-role', cmd: 'query'}
 ```
 
 ### select
@@ -424,7 +424,7 @@ Example:
 ```js
 var mySelect = {title: 'About seneca'}
 // Query
-act({role: 'my_role', cmd: 'query', select: mySelect})
+act({role: 'my-role', cmd: 'query', select: mySelect})
 .then(function(result) {
   console.log(result.list)
   return result
@@ -444,7 +444,7 @@ var myDeepSelect = [
   {property: 'city.zipcode', value: '59491'}
 ]
 // Query
-act({role: 'my_role', cmd: 'query', deepselect: myDeepSelect})
+act({role: 'my-role', cmd: 'query', deepselect: myDeepSelect})
 .then(function(result) {
   console.log(result.list)
   return result
@@ -467,7 +467,7 @@ The result object contains these values:
 Use this command to retrieve a number of entities from your database. The pattern is:
 
 ```js
-{role: 'my_role', cmd: 'count'}
+{role: 'my-role', cmd: 'count'}
 ```
 
 As the query command, the count command can use select and deep select filters. See the previous query command for more explanations.
@@ -480,7 +480,7 @@ var myDeepSelect = [
   {property: 'city.zipcode', value: '59491'}
 ]
 // Count
-act({role: 'my_role', cmd: 'count', select: mySelect, deepselect: myDeepSelect})
+act({role: 'my-role', cmd: 'count', select: mySelect, deepselect: myDeepSelect})
 .then(function(result) {
   console.log(result.count)
   return result
