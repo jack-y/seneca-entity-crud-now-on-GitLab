@@ -1,4 +1,4 @@
-/* Copyright (c) 2016 e-soa Jacques Desodt */
+/* Copyright (c) 2016-2017 e-soa Jacques Desodt */
 'use strict'
 
 /* Default plugin options */
@@ -62,8 +62,12 @@ module.exports = function (options) {
     .then(function (result) {
       // Checks validation
       if (result.success) {
+        // Gets the namespace
+        var zone = args.zone ? args.zone : options.zone
+        var base = args.base ? args.base : options.base
+        var name = args.name ? args.name : options.name
         // Creates the entity
-        act({role: options.role, cmd: 'create', entity: args.entity})
+        act({role: options.role, zone: zone, base: base, name: name, cmd: 'create', entity: args.entity})
         .then(function (result) {
           done(null, result)
         })
@@ -78,7 +82,7 @@ module.exports = function (options) {
    * CRUD Create: new entity persistence.
    * <p>
    * Before the insert, the entity data validation is called.
-   * If the validation is not successful, return the errors array.
+   * If the validation fail, return the errors array.
    * <p>
    * If the 'last_update' option is set to true, the field 'last_update'
    * is set on current date and added to the entity before insert.
@@ -96,8 +100,12 @@ module.exports = function (options) {
       if (options.last_update) {
         entity.last_update = Date.now()
       }
+      // Gets the namespace
+      var zone = args.zone ? args.zone : options.zone
+      var base = args.base ? args.base : options.base
+      var name = args.name ? args.name : options.name
       // Saves the entity in the database
-      var entityFactory = seneca.make$(options.zone, options.base, options.name)
+      var entityFactory = seneca.make$(zone, base, name)
       entityFactory.save$(entity, function (err, entity) {
         if (err) { throw err }
         // Returns the new entity with id set
@@ -112,8 +120,12 @@ module.exports = function (options) {
    * If the entity is not found, return {success:false}.
    */
   function read (args, done) {
+    // Gets the namespace
+    var zone = args.zone ? args.zone : options.zone
+    var base = args.base ? args.base : options.base
+    var name = args.name ? args.name : options.name
     // Gets the entity factory
-    var entityFactory = seneca.make$(options.zone, options.base, options.name)
+    var entityFactory = seneca.make$(zone, base, name)
     // Reads the entity in the database
     entityFactory.load$(args.id, (err, entity) => {
       if (err) { throw err }
@@ -140,8 +152,12 @@ module.exports = function (options) {
     .then(function (result) {
       // Checks validation
       if (result.success) {
+        // Gets the namespace
+        var zone = args.zone ? args.zone : options.zone
+        var base = args.base ? args.base : options.base
+        var name = args.name ? args.name : options.name
         // Creates the entity
-        act({role: options.role, cmd: 'update', entity: args.entity})
+        act({role: options.role, zone: zone, base: base, name: name, cmd: 'update', entity: args.entity})
         .then(function (result) {
           done(null, result)
         })
@@ -156,7 +172,7 @@ module.exports = function (options) {
   * CRUD Update: updated entity persistence.
   * <p>
   * Before the update, the entity data is validated.
-  * If the validation is not successful, return the errors array.
+  * If the validation fail, return the errors array.
   * <p>
   * If the 'last_update' option is set to true, the field 'last_update'
   * is set on current date and added to the entity before update.
@@ -168,8 +184,12 @@ module.exports = function (options) {
     if (options.last_update) {
       entity.last_update = Date.now()
     }
+    // Gets the namespace
+    var zone = args.zone ? args.zone : options.zone
+    var base = args.base ? args.base : options.base
+    var name = args.name ? args.name : options.name
     // Saves the entity in the database
-    var entityFactory = seneca.make$(options.zone, options.base, options.name)
+    var entityFactory = seneca.make$(zone, base, name)
     entityFactory.save$(entity, function (err, entity) {
       if (err) { throw err }
       // Returns the updated entity
@@ -183,8 +203,12 @@ module.exports = function (options) {
   * If the entity is not found, return {success:false}.
   */
   function delet (args, done) {
+    // Gets the namespace
+    var zone = args.zone ? args.zone : options.zone
+    var base = args.base ? args.base : options.base
+    var name = args.name ? args.name : options.name
     // Database entity creation
-    var entityFactory = seneca.make$(options.zone, options.base, options.name)
+    var entityFactory = seneca.make$(zone, base, name)
     // Deletes the entity in the database
     entityFactory.remove$(args.id, (err, result) => {
       if (err) { throw err }
@@ -200,15 +224,19 @@ module.exports = function (options) {
   *
   */
   function truncate (args, done) {
-  // Gets the entity factory
-    var entityFactory = seneca.make$(options.zone, options.base, options.name)
+    // Gets the namespace
+    var zone = args.zone ? args.zone : options.zone
+    var base = args.base ? args.base : options.base
+    var name = args.name ? args.name : options.name
+    // Gets the entity factory
+    var entityFactory = seneca.make$(zone, base, name)
     // Gets the list of all the entities from the database
     entityFactory.list$({}, (err, list) => {
       if (err) { throw err }
       // Deletes each entity
       var cmds = []
       list.forEach(function (item) {
-        var command = act({role: options.role, cmd: 'delete', id: item.id})
+        var command = act({role: options.role, zone: zone, base: base, name: name, cmd: 'delete', id: item.id})
         cmds.push(command)
       })
       promise.all(cmds)
@@ -226,8 +254,12 @@ module.exports = function (options) {
   * for filters, sorts and others options.
   */
   function query (args, done) {
+    // Gets the namespace
+    var zone = args.zone ? args.zone : options.zone
+    var base = args.base ? args.base : options.base
+    var name = args.name ? args.name : options.name
     // Gets the entity factory
-    var entityFactory = seneca.make$(options.zone, options.base, options.name)
+    var entityFactory = seneca.make$(zone, base, name)
     // Gets the query options
     var select = args.select ? args.select : {}
     var deepSelect = args.deepselect ? args.deepselect : []
@@ -256,8 +288,12 @@ module.exports = function (options) {
   * for filters, sorts and others options.
   */
   function count (args, done) {
+    // Gets the namespace
+    var zone = args.zone ? args.zone : options.zone
+    var base = args.base ? args.base : options.base
+    var name = args.name ? args.name : options.name
     // Gets the entity factory
-    var entityFactory = seneca.make$(options.zone, options.base, options.name)
+    var entityFactory = seneca.make$(zone, base, name)
     // Gets the query options
     var select = args.select ? args.select : {}
     var deepSelect = args.deepselect ? args.deepselect : []

@@ -13,7 +13,7 @@ The [seneca-entity][] plugin already provides simple persistent functions: `save
 
 ## Why this plugin?
 
-When we develop real applications, we often have to manage a lot of entities. For example: customer, product, catalog, address, order, sell, relations between them and so one. 
+When we develop real applications, we often have to manage a lot of entities. For example: customer, product, catalog, address, order, sell, relations between them and so one.
 Working with the [seneca-entity][] plugin, the same kind of code can be duplicated a lot of time. For example, this a code used to simply read an entity:
 
 ```js
@@ -37,8 +37,8 @@ const seneca = require('seneca')()
 var act = promise.promisify(seneca.act, {context: seneca})
 ```
 
-And here is our new code used to read an entity: 
-	
+And here is our new code used to read an entity:
+
 ```js
 // Reads the entity in the database
 act({role: myRole, cmd: 'read', id: anId})
@@ -55,7 +55,7 @@ One very nice thing: in addition to CRUD, this plugin offers additional commands
 - The `query` command encapsulate the `list$` function.
 - The `count` command encapsulate the `list$` function, but return only the count for network optimization.
 
-And we even lie on the floor: 
+And we even lie on the floor:
 
 - This plugin includes an optional input data validation functionality to be used before the create or update action.
 - A `last_update` date value can be automatically added to each entity when created or updated.
@@ -256,7 +256,7 @@ Try it! The console shows:
 errors: [{"field":"title","actual":null,"error":"the title is required"}]
 ```
 
-and the message `This message will never be shown.` ...will never be shown ;). 
+and the message `This message will never be shown.` ...will never be shown ;).
 
 # API: commands specifications
 
@@ -267,6 +267,8 @@ Use this command to add a new entity into your database. The pattern is:
 ```js
 {role: 'my-role', cmd: 'create', entity: newEntity}
 ```
+
+You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
 `validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: Input data validation.
 
@@ -298,6 +300,8 @@ Use this command to retrieve an entity from your database. The pattern is:
 {role: 'my-role', cmd: 'read', id: anId}
 ```
 
+You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
+
 Example:
 
 ```js
@@ -322,6 +326,8 @@ Use this command to update an entity previously inserted into your database. The
 ```js
 {role: 'my-role', cmd: 'update', entity: anEntity}
 ```
+
+You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
 `validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: Input data validation.
 
@@ -355,6 +361,8 @@ Use this command to remove an entity from your database. The pattern is:
 {role: 'my-role', cmd: 'delete', id: anId}
 ```
 
+You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
+
 Example:
 
 ```js
@@ -379,6 +387,8 @@ Use this command to remove all the entities from your database. The pattern is:
 {role: 'my-role', cmd: 'truncate'}
 ```
 
+You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
+
 Example:
 
 ```js
@@ -394,7 +404,7 @@ The result object contains this value:
 
 - **success**: `true`.
 
-> Note: at this time, the truncate command execute a remove$ action entity by entity. It does not perform well. If you know a better solution, we take! 
+> Note: at this time, the truncate command execute a remove$ action entity by entity. It does not perform well. If you know a better solution, we take!
 
 ## query
 
@@ -403,6 +413,8 @@ Use this command to retrieve a list of entities from your database. The pattern 
 ```js
 {role: 'my-role', cmd: 'query'}
 ```
+
+You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
 ### select
 
@@ -417,7 +429,7 @@ A **select** optional argument can be added to the pattern: `select: {... some f
 
 > Note: you can use `sort$`, `limit$`, `skip$` and `fields$` together.
 
-For more information, see the seneca [Query Syntax][] tutorial. 
+For more information, see the seneca [Query Syntax][] tutorial.
 
 Example:
 
@@ -469,6 +481,8 @@ Use this command to retrieve a number of entities from your database. The patter
 ```js
 {role: 'my-role', cmd: 'count'}
 ```
+
+You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
 As the query command, the count command can use select and deep select filters. See the previous query command for more explanations.
 
