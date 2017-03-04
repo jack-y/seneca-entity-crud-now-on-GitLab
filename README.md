@@ -305,7 +305,7 @@ Use this command to retrieve an entity from your database. The pattern is:
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
-You can pass a `joins` value to process deep reading from IDs contained in the entity. See the [joins][] feature. 
+You can pass a `joins` value to process deep reading from IDs contained in the entity. See the [joins][] feature.
 
 Example:
 
@@ -421,7 +421,7 @@ Use this command to retrieve a list of entities from your database. The pattern 
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
-You can pass a `joins` value to process deep reading from IDs contained in the entities. See the [joins][] feature. 
+You can pass a `joins` value to process deep reading from IDs contained in the entities. See the [joins][] feature.
 
 ### select
 
@@ -548,4 +548,4 @@ Licensed under [MIT][].
 [shortid]: https://cnpmjs.org/package/shortid
 [Query syntax]: http://senecajs.org/docs/tutorials/understanding-query-syntax.html
 [seneca mesh]: https://github.com/senecajs/seneca-mesh
-[joins]: https://github.com/jack-y/seneca-entity-crud/joins
+[joins]: https://github.com/jack-y/seneca-entity-crud/tree/master/joins
