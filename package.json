@@ -31,6 +31,6 @@
     "url": "https://github.com/jack-y/seneca-entity-crud"
   },
   "scripts": {
-    "test": "node ./test.js"
+    "test": "node ./test.js && node ./test_joins.js"
   }
 }

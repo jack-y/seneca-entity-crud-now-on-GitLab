@@ -48,11 +48,10 @@ module.exports = function (options) {
 
   /**
    * Validate and create: new entity persistence.
-   * <p>
+   *
    * Before the insert, the entity data validation is called.
    * If the validation fail, return the errors array.
    * Otherwise the create command is called.
-   *
    */
   function validateAndCreate (args, done) {
     // Checks the arguments validate function
@@ -80,16 +79,13 @@ module.exports = function (options) {
 
   /**
    * CRUD Create: new entity persistence.
-   * <p>
-   * Before the insert, the entity data validation is called.
-   * If the validation fail, return the errors array.
-   * <p>
+   *
    * If the 'last_update' option is set to true, the field 'last_update'
    * is set on current date and added to the entity before insert.
    */
   function create (args, done) {
-    // Checks if entity is passed
     var errors = args.errors ? args.errors : []
+    // Checks if the entity is passed
     if (!args.entity) {
       errors.push({field: null, actual: null, error: options.msg_no_entity})
       done(null, {success: false, errors: errors})
@@ -116,7 +112,7 @@ module.exports = function (options) {
 
   /**
    * CRUD Read: reads an entity from its ID.
-   * <p>
+   *
    * If the entity is not found, return {success:false}.
    */
   function read (args, done) {
@@ -131,18 +127,28 @@ module.exports = function (options) {
       if (err) { throw err }
       // Checks if the entity is found
       var success = entity !== null
-      // Returns the read entity or success=false
-      done(null, {success: success, entity: entity})
+      // Checks if joins are requested
+      var joinsList = args.joins ? args.joins : null
+      if (success && joinsList) {
+        // Perform the joins reading
+        readJoins(entity, joinsList)
+        .then(function (result) {
+          // Returns the read entity with joins
+          return done(null, {success: success, entity: result.entity})
+        })
+      } else {
+        // Returns the read entity or success=false
+        done(null, {success: success, entity: entity})
+      }
     })
   }
 
   /**
    * Validate and update: updated entity persistence.
-   * <p>
+   *
    * Before the update, the entity data validation is called.
    * If the validation fail, return the errors array.
    * Otherwise the Update command is called.
-   *
    */
   function validateAndUpdate (args, done) {
     // Checks the arguments validate function
@@ -170,10 +176,7 @@ module.exports = function (options) {
 
   /**
   * CRUD Update: updated entity persistence.
-  * <p>
-  * Before the update, the entity data is validated.
-  * If the validation fail, return the errors array.
-  * <p>
+  *
   * If the 'last_update' option is set to true, the field 'last_update'
   * is set on current date and added to the entity before update.
   */
@@ -199,7 +202,7 @@ module.exports = function (options) {
 
   /**
   * CRUD Delete: deletes an entity from its ID.
-  * <p>
+  *
   * If the entity is not found, return {success:false}.
   */
   function delet (args, done) {
@@ -219,9 +222,8 @@ module.exports = function (options) {
 
   /**
   * Truncate: deletes all the entities from the database.
-  * <p>
-  * TODO: find another optimized process for big data.
   *
+  * TODO: find another optimized process for big data.
   */
   function truncate (args, done) {
     // Gets the namespace
@@ -249,7 +251,7 @@ module.exports = function (options) {
 
   /**
   * Query: gets lists of entities from the database.
-  * <p>
+  *
   * See <a href="http://senecajs.org/docs/tutorials/understanding-query-syntax.html">the seneca syntax</a>
   * for filters, sorts and others options.
   */
@@ -276,14 +278,25 @@ module.exports = function (options) {
           deepList = selectDeep(deepList, item)
         })
       }
-      // Returns the list
-      done(null, {success: true, list: deepList})
+      // Checks if joins are requested
+      var joinsList = args.joins ? args.joins : null
+      if (deepList.length > 0 && joinsList) {
+        // Perform the joins reading
+        readJoinsForList(deepList, joinsList)
+        .then(function (result) {
+          // Returns the read entity with joins
+          return done(null, {success: true, list: result.list})
+        })
+      } else {
+        // Returns the list
+        done(null, {success: true, list: deepList})
+      }
     })
   }
 
   /**
   * Count: gets count from lists of entities from the database.
-  * <p>
+  *
   * See <a href="http://senecajs.org/docs/tutorials/understanding-query-syntax.html">the seneca syntax</a>
   * for filters, sorts and others options.
   */
@@ -337,6 +350,68 @@ module.exports = function (options) {
       return fetchFromObject(anObject[property.substring(0, _index)], property.substr(_index + 1))
     }
     return anObject[property]
+  }
+
+  /* --------------- JOINS --------------- */
+
+  /* Process joins on one entity */
+  function readJoins (entity, joinsList) {
+    return new Promise(function (resolve, reject) {
+      var joinread = 0
+      // Loops on each join
+      joinsList.forEach(function (join, index) {
+        readOneJoin(entity, join)
+        .then(function (result) {
+          if (++joinread === joinsList.length) {
+            // When all joins are done, returns the full entity
+            resolve({entity: entity})
+          }
+        })
+      })
+    })
+  }
+
+  /* Process joins on a list of entities */
+  function readJoinsForList (list, joinsList) {
+    return new Promise(function (resolve, reject) {
+      var newList = []
+      var itemread = 0
+      // Loops on each entity of the list
+      list.forEach(function (entity, index) {
+        // Process joins on the entity
+        readJoins(entity, joinsList)
+        .then(function (result) {
+          newList.push(result.entity)
+          if (++itemread === list.length) {
+            // When all joins are done, returns the full entity
+            resolve({list: newList})
+          }
+        })
+      })
+    })
+  }
+
+  /* Reads the entity specified by the join */
+  function readOneJoin (originEntity, join) {
+    return new Promise(function (resolve, reject) {
+      // Gets the namespace
+      var zone = join.zone ? join.zone : null
+      var base = join.base ? join.base : null
+      var name = join.name ? join.name : null
+      // Sets the ID and new field name
+      var id = originEntity[join.idname]
+      var fieldname = join.resultname ? join.resultname : join.role
+      // Reads the entity by its ID
+      act({role: join.role, zone: zone, base: base, name: name, cmd: 'read', id: id, joins: join.joins})
+      .then(function (result) {
+        if (result.success) {
+          // Adds the result to the origin entity
+          originEntity[fieldname] = result.entity
+        }
+        // When read is done, returns the full entity
+        resolve({entity: originEntity})
+      })
+    })
   }
 
   /* plugin ends */

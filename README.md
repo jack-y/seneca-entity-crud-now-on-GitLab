@@ -1,9 +1,11 @@
+### New feature: joins! See the [joins][] readme page.
+
 ![Logo]
 > A [seneca.js][] entity CRUD plugin.
 
 # seneca-entity-crud
 
-Last update: 12/31/2016   
+Last update: 03/04/2017  
 
 ## Description
 
@@ -59,6 +61,7 @@ And we even lie on the floor:
 
 - This plugin includes an optional input data validation functionality to be used before the create or update action.
 - A `last_update` date value can be automatically added to each entity when created or updated.
+- The [joins][] feature provides deep readings from IDs contained in entities.
 
 Enjoy!
 
@@ -145,7 +148,7 @@ Try it! The console shows:
 
 	My great post ID is: <an id like 5a4732ef4049cfcb07d992007e003932>
 
-For **the list of the commands** and their arguments, see the chapter below: Commands specifications.
+For **the list of the commands** and their arguments, see the chapter below: [API commands specifications](#api-commands-specifications).
 
 > Note: the ID generated for the entity is provided by the store plugin used in your application.
 
@@ -258,7 +261,7 @@ errors: [{"field":"title","actual":null,"error":"the title is required"}]
 
 and the message `This message will never be shown.` ...will never be shown ;).
 
-# API: commands specifications
+# API commands specifications
 
 ## create
 
@@ -270,7 +273,7 @@ Use this command to add a new entity into your database. The pattern is:
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
-`validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: Input data validation.
+`validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: [Input data validation](#input-data-validation).
 
 Example:
 
@@ -302,6 +305,8 @@ Use this command to retrieve an entity from your database. The pattern is:
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
+You can pass a `joins` value to process deep reading from IDs contained in the entity. See the [joins][] feature. 
+
 Example:
 
 ```js
@@ -329,7 +334,7 @@ Use this command to update an entity previously inserted into your database. The
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
-`validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: Input data validation.
+`validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: [Input data validation](#input-data-validation).
 
 > Note: the entity must have its `id` field set.
 
@@ -416,6 +421,8 @@ Use this command to retrieve a list of entities from your database. The pattern 
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
+You can pass a `joins` value to process deep reading from IDs contained in the entities. See the [joins][] feature. 
+
 ### select
 
 A **select** optional argument can be added to the pattern: `select: {... some filters ...}` . If no select argument is provided, an empty select object is used. The select argument support the standard Seneca query format:
@@ -463,7 +470,7 @@ act({role: 'my-role', cmd: 'query', deepselect: myDeepSelect})
 })
 ```
 
-In this example, only the entities whose city contains the zip code '59491' are retrieved.
+In this example, only the entities whose city contains the zip code `'59491'` are retrieved.
 
 You can use together the select and deep select filters as you want.
 
@@ -484,7 +491,7 @@ Use this command to retrieve a number of entities from your database. The patter
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
-As the query command, the count command can use select and deep select filters. See the previous query command for more explanations.
+As the query command, the count command can use select and deep select filters. See the previous [query command](#query) for more explanations.
 
 Example:
 
@@ -541,3 +548,4 @@ Licensed under [MIT][].
 [shortid]: https://cnpmjs.org/package/shortid
 [Query syntax]: http://senecajs.org/docs/tutorials/understanding-query-syntax.html
 [seneca mesh]: https://github.com/senecajs/seneca-mesh
+[joins]: https://github.com/jack-y/seneca-entity-crud/joins
