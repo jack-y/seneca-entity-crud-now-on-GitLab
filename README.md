@@ -1,11 +1,9 @@
-### New feature: joins! See the [joins][] readme page.
-
 ![Logo]
 > A [seneca.js][] entity CRUD plugin.
 
 # seneca-entity-crud
 
-Last update: 03/04/2017  
+Last update: 04/10/2017  
 
 ## Description
 
@@ -336,9 +334,13 @@ You can pass `base`, `zone` and `name` of your entity namespace as optional argu
 
 `validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: [Input data validation](#input-data-validation).
 
-> Note: the entity must have its `id` field set.
+Depending on the store plugin used, the **save** seneca entity action can forgot the fields not set in the `update` command. To prevent this, the **update** command equals a read-and-save seneca entity action. Only the fields set in the pattern argument entity are updated or inserted in the database. The other fields remain unchanged. The entity ID must be found in the database. If not, a `success: false` result is fired.
 
-> Note: The update command does not verify whether the entity ID exists in the database before the update. If the entity ID does not exist, the entity will still be created.
+The update or insert of the fields work as a javascript `assign` function:
+
+Origin database entity: `{id:'1234', name: 'John Doo', phone: 789}`
+Update command entity: `{id: '1234', phone: 0001, email: 'me@server.com'}`
+Result database entity: `{id:'1234', name: 'John Doo', phone: 0001, email: 'me@server.com'}`
 
 Example:
 
@@ -354,7 +356,7 @@ act({role: 'my-role', cmd: 'update', entity: myEntity})
 
 The result object contains these values:
 
-- **success**: `true` or `false`. `false` is returned if the input data validation is used and fail.
+- **success**: `true` or `false`. `false` is returned if the input data validation is used and fail, or if the entity ID is not found.
 - **errors**: an array. If the input data validation is used and fail, `errors` is the array of error objects. An example of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
 - **entity**: if there is no data validation or if it has succeeded, this value is the input entity updated. If the `last_update` plugin option is set to `true`, this value has its `last_update` field set with the current date.
 

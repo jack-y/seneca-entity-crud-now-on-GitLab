@@ -1,6 +1,6 @@
 {
   "name": "seneca-entity-crud",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "CRUD standard actions on entities",
   "keywords": [
     "node.js",

@@ -207,16 +207,18 @@ seneca.ready(function (err) {
 
   function testUpdate (args, done) {
     // Initializes the data
-    var entity = {title: 'Life on Venus', content: 'Listen to this song written by David Bowie.'}
+    var content = 'Listen to this song written by David Bowie.'
     var updateTitle = 'Life on Mars'
+    var updateTag = 'A tag'
+    var entity = {title: 'Life on Venus', content: content}
     // Calls the create action
     act({role: role, cmd: 'create', entity: entity})
     .then(function (result) {
          // Checks result
       assert.notEqual(result.entity.id, null)
         // Calls the update action
-      result.entity.title = updateTitle
-      act({role: role, cmd: 'update', entity: result.entity})
+      var updateEntity = {id: result.entity.id, title: updateTitle, tag: updateTag}
+      act({role: role, cmd: 'update', entity: updateEntity})
       .then(function (result) {
              // Checks result
         assert.ok(result.success)
@@ -226,6 +228,8 @@ seneca.ready(function (err) {
           // Checks result
           assert.ok(result.success)
           assert.equal(result.entity.title, updateTitle)
+          assert.equal(result.entity.content, content)
+          assert.equal(result.entity.tag, updateTag)
           console.log('entity-crud: test_update successful.')
           done(null, {success: true})
         })

@@ -181,22 +181,36 @@ module.exports = function (options) {
   * is set on current date and added to the entity before update.
   */
   function update (args, done) {
+    var errors = []
     // Gets the entity (ID must be set)
-    var entity = args.entity
+    var updateEntity = args.entity
     // Checks if last update date has to be set
     if (options.last_update) {
-      entity.last_update = Date.now()
+      updateEntity.last_update = Date.now()
     }
     // Gets the namespace
     var zone = args.zone ? args.zone : options.zone
     var base = args.base ? args.base : options.base
     var name = args.name ? args.name : options.name
-    // Saves the entity in the database
     var entityFactory = seneca.make$(zone, base, name)
-    entityFactory.save$(entity, function (err, entity) {
+    // Reads the origin entity in the database
+    entityFactory.load$(updateEntity.id, (err, readEntity) => {
       if (err) { throw err }
-      // Returns the updated entity
-      done(null, {success: true, errors: [], entity: entity})
+      // Checks if the entity is found
+      var success = readEntity !== null
+      if (success) {
+        // Merges the fields
+        Object.assign(readEntity, updateEntity)
+        // Saves the entity in the database
+        entityFactory.save$(readEntity, function (err, updatedEntity) {
+          if (err) { throw err }
+          // Returns the updated entity
+          return done(null, {success: true, errors: errors, entity: updatedEntity})
+        })
+      } else {
+        errors.push({field: 'id', actual: updateEntity.id, error: 'not found'})
+        done(null, {success: false, errors: errors, entity: readEntity})
+      }
     })
   }
 
