@@ -18,6 +18,7 @@ const act = promise.promisify(seneca.act, {context: seneca})
 
 /* Initializations */
 seneca
+  .use('basic')
   .use('entity')
   .use('mem-store')
   .use(entityCrud, {

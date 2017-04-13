@@ -3,7 +3,7 @@
 
 # seneca-entity-crud
 
-Last update: 04/10/2017  
+Last update: 04/13/2017  
 
 ## Description
 
@@ -112,6 +112,7 @@ const seneca = require('seneca')()
 
 /* Plugin declaration */
 seneca
+  .use('basic') // For Seneca >= 3.x
   .use('entity')
   .use('mem-store')
   .use('seneca-entity-crud', {
@@ -205,6 +206,7 @@ const seneca = require('seneca')()
 
 /* Plugins declaration */
 seneca
+  .use('basic') // For Seneca >= 3.x
   .use('entity')
   .use('mem-store')
   .use('seneca-entity-crud', {
@@ -334,15 +336,18 @@ You can pass `base`, `zone` and `name` of your entity namespace as optional argu
 
 `validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: [Input data validation](#input-data-validation).
 
-Depending on the store plugin used, the **save** seneca entity action can forgot the fields not set in the `update` command. To prevent this, the **update** command equals a read-and-save seneca entity action. Only the fields set in the pattern argument entity are updated or inserted in the database. The other fields remain unchanged. The entity ID must be found in the database. If not, a `success: false` result is fired.
+The entity ID must be found in the database. If not, a `success: false` result is fired.
 
-The update or insert of the fields work as a javascript `assign` function:
+Not all fields must always be updated in the past entity as an argument. Only the ID and fields to be updated or inserted are required. However, depending on the used store plugin, the **save** seneca-entity action can remove undeclared fields from the database. To avoid this, the **update** command is equal to a read-assign-save action. Undeclared fields remain unchanged.
 
-Origin database entity: `{id:'1234', name: 'John Doo', phone: 789}`
-Update command entity: `{id: '1234', phone: 0001, email: 'me@server.com'}`
-Result database entity: `{id:'1234', name: 'John Doo', phone: 0001, email: 'me@server.com'}`
+Updating or inserting fields uses the `assign` javascript function:
 
-Example:
+Origin database entity: ```{id:'1234', name: 'John Doo', phone: 789}```
+Update command entity: ```{id: '1234', phone: 0001, email: 'me@server.com'}```
+Final database entity: ```{id:'1234', name: 'John Doo', phone: 0001, email: 
+'me@server.com'}```
+
+Example of an **update** call:
 
 ```js
 var myEntity = {id: '5a4732ef4049cfcb07d992007e003932', title: 'A new title', content: '<h1>This is a post about cats</h1><p>Maoww...</p>'}
