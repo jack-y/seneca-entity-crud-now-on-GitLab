@@ -10,11 +10,11 @@
     "crud"
   ],
   "dependencies": {
-    "bluebird": "3.4.x",
+    "bluebird": "3.4.x"
   },
   "devDependencies": {
     "seneca": "3.x",
-	"seneca-basic": "0.5.x",
+    "seneca-basic": "0.5.x",
     "seneca-entity": "2.x",
   },
   "url": "https://github.com/jack-y/seneca-entity-crud",
