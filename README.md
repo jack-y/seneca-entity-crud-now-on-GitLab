@@ -3,7 +3,7 @@
 
 # seneca-entity-crud
 
-Last update: 04/13/2017  
+Last update: 04/23/2017  
 
 ## Description
 
@@ -340,12 +340,13 @@ The entity ID must be found in the database. If not, a `success: false` result i
 
 Not all fields must always be updated in the past entity as an argument. Only the ID and fields to be updated or inserted are required. However, depending on the used store plugin, the **save** seneca-entity action can remove undeclared fields from the database. To avoid this, the **update** command is equal to a read-assign-save action. Undeclared fields remain unchanged.
 
-Updating or inserting fields uses the `assign` javascript function:
+Updating or inserting fields uses the `assign` javascript function, like:
 
-Origin database entity: ```{id:'1234', name: 'John Doo', phone: 789}```
-Update command entity: ```{id: '1234', phone: 0001, email: 'me@server.com'}```
-Final database entity: ```{id:'1234', name: 'John Doo', phone: 0001, email: 
-'me@server.com'}```
+```
+Origin database entity: {id:'1234', name: 'John Doe', phone: 789}
+Update command entity: {id: '1234', phone: 0001, email: 'me@server.com'}
+-> Final database entity: {id:'1234', name: 'John Doe', phone: 0001, email: 'me@server.com'}
+```
 
 Example of an **update** call:
 
@@ -487,6 +488,7 @@ The result object contains these values:
 
 - **success**: `true`.
 - **list**: the entities array, according to the filters. If no entity match the filters, an empty array is returned.
+- **count**: the number of entities, according to the filters. If no entity match the filters, the `0` value is returned.
 
 ## count
 

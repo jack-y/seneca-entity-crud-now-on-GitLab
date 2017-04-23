@@ -327,6 +327,7 @@ seneca.ready(function (err) {
                // Checks result
           assert.ok(result.success)
           assert.equal(result.list.length, posts.length)
+          assert.equal(result.count, posts.length)
           return result
         })
         .then(function (result) {
@@ -336,6 +337,7 @@ seneca.ready(function (err) {
                  // Checks result
             assert.ok(result.success)
             assert.equal(result.list.length, tuesdayCount)
+            assert.equal(result.count, tuesdayCount)
             return result
           })
         })
@@ -345,7 +347,7 @@ seneca.ready(function (err) {
           .then(function (result) {
                  // Checks result
             assert.ok(result.success)
-            assert.equal(result.list.length, posts.length)
+            assert.equal(result.count, posts.length)
             assert.equal(result.list[0].title, 'Life on Mars')
             return result
           })

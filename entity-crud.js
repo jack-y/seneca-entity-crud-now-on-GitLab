@@ -299,11 +299,11 @@ module.exports = function (options) {
         readJoinsForList(deepList, joinsList)
         .then(function (result) {
           // Returns the read entity with joins
-          return done(null, {success: true, list: result.list})
+          return done(null, {success: true, list: result.list, count: result.list.length})
         })
       } else {
         // Returns the list
-        done(null, {success: true, list: deepList})
+        done(null, {success: true, list: deepList, count: deepList.length})
       }
     })
   }
