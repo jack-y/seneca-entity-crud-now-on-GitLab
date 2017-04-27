@@ -419,6 +419,27 @@ The result object contains this value:
 
 > Note: at this time, the truncate command execute a remove$ action entity by entity. It does not perform well. If you know a better solution, we take!
 
+### truncate and seneca-mesh
+
+The `truncate` action generates a `delete` action that is immediately consumed by this plugin. **There is no publication of the `delete` action at the top-level mesh base or service**: this plugin can't know this top-level. This behavior depends on the application itself.
+
+In the application, if the `truncate` action is intended to publish the generated `delete` actions, we should use this kind of code instead:
+
+```js
+act({role: 'my-role', cmd: 'query'})
+.then(function(result) {
+  result.list.forEach(function(item) {
+    var command = act({role: 'my-role', cmd: 'delete', id: item.id})
+    cmds.push(command)    
+  })
+  promise.all(cmds)
+  .then(function (results) {
+    // Do some stuff...
+    return results
+  })
+})
+```
+
 ## query
 
 Use this command to retrieve a list of entities from your database. The pattern is:
