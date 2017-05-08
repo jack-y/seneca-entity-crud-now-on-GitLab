@@ -1,6 +1,6 @@
 # joins feature
 
-Last update: 03/03/2017   
+Last update: 05/08/2017
 
 ## Description
 
@@ -79,6 +79,7 @@ The **joins** value is an array of join objects.
 
 You can pass base, zone and name of your entity namespace as optional arguments to override the options.
 
+You can pass an optional `nonamespace: true` argument to remove the namespace of the resulting entity. See the seneca-entity-crud [README file][] for more information..
 
 > Note: the `resultname` value is optional.
 
@@ -268,6 +269,7 @@ Licensed under [MIT][].
 [MIT]: ../LICENSE
 [Senecajs org]: https://github.com/senecajs/
 [seneca-entity-crud]: https://github.com/jack-y/seneca-entity-crud
+[README file]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#the-returned-namespace
 [read]: https://github.com/jack-y/seneca-entity-crud#read
 [query]: https://github.com/jack-y/seneca-entity-crud#query
 [this post]: http://microservices.io/patterns/data/database-per-service.html

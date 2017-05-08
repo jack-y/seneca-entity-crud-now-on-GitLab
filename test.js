@@ -58,12 +58,16 @@ seneca.ready(function (err) {
   seneca.add({role: role, cmd: 'test_create_bad_validation'}, testCreateBadValidation)
   seneca.add({role: role, cmd: 'test_create_validation_ok'}, testCreateValidationOk)
   seneca.add({role: role, cmd: 'test_create'}, testCreate)
+  seneca.add({role: role, cmd: 'test_create_nonamespace'}, testCreateNoNamespace)
   seneca.add({role: role, cmd: 'test_read'}, testRead)
+  seneca.add({role: role, cmd: 'test_read_nonamespace'}, testReadNoNamespace)
   seneca.add({role: role, cmd: 'test_read_not_found'}, testReadNotFound)
   seneca.add({role: role, cmd: 'test_update'}, testUpdate)
+  seneca.add({role: role, cmd: 'test_update_nonamespace'}, testUpdateNoNamespace)
   seneca.add({role: role, cmd: 'test_delete'}, testDelete)
   seneca.add({role: role, cmd: 'test_truncate'}, testTruncate)
   seneca.add({role: role, cmd: 'test_query'}, testQuery)
+  seneca.add({role: role, cmd: 'test_query_nonamespace'}, testQueryNoNamespace)
   seneca.add({role: role, cmd: 'test_deep_query'}, testDeepQuery)
 
   /* Run tests */
@@ -77,22 +81,34 @@ seneca.ready(function (err) {
         .then(function (result) {
           act({role: role, cmd: 'test_create'})
           .then(function (result) {
-            act({role: role, cmd: 'test_read'})
+            act({role: role, cmd: 'test_create_nonamespace'})
             .then(function (result) {
-              act({role: role, cmd: 'test_read_not_found'})
+              act({role: role, cmd: 'test_read'})
               .then(function (result) {
-                act({role: role, cmd: 'test_update'})
+                act({role: role, cmd: 'test_read_nonamespace'})
                 .then(function (result) {
-                  act({role: role, cmd: 'test_delete'})
+                  act({role: role, cmd: 'test_read_not_found'})
                   .then(function (result) {
-                    act({role: role, cmd: 'test_truncate'})
+                    act({role: role, cmd: 'test_update'})
                     .then(function (result) {
-                      act({role: role, cmd: 'test_query'})
+                      act({role: role, cmd: 'test_update_nonamespace'})
                       .then(function (result) {
-                        act({role: role, cmd: 'test_deep_query'})
+                        act({role: role, cmd: 'test_delete'})
                         .then(function (result) {
-                          console.log('entity-crud: tests successful.')
-                          return result
+                          act({role: role, cmd: 'test_truncate'})
+                          .then(function (result) {
+                            act({role: role, cmd: 'test_query'})
+                            .then(function (result) {
+                              act({role: role, cmd: 'test_query_nonamespace'})
+                              .then(function (result) {
+                                act({role: role, cmd: 'test_deep_query'})
+                                .then(function (result) {
+                                  console.log('entity-crud: tests successful.')
+                                  return result
+                                })
+                              })
+                            })
+                          })
                         })
                       })
                     })
@@ -106,7 +122,7 @@ seneca.ready(function (err) {
     })
   })
 
-    /* Functions */
+    /* CREATE */
 
   function testCreateNoData (args, done) {
     // Calls the create action
@@ -175,6 +191,24 @@ seneca.ready(function (err) {
     })
   }
 
+  function testCreateNoNamespace (args, done) {
+    // Initializes the data
+    var entity = {title: 'Security', content: '<h1>Security</h1><p>We don\'t want namespaces!</p>'}
+    // Calls the create action
+    act({role: role, cmd: 'create', entity: entity, nonamespace: true})
+    .then(function (result) {
+      // Checks result
+      assert.ok(result.success)
+      assert.equal(result.entity.entity$, null)
+      assert.notEqual(result.entity.id, null)
+      assert.notEqual(result.entity.last_update, null)
+      console.log('entity-crud: test_create_nonamespace successful.')
+      done(null, {success: true})
+    })
+  }
+
+  /* READ */
+
   function testRead (args, done) {
     // Initializes the data
     var entity = {title: 'Life on Mars', content: 'Listen to this song written by  David Bowie.'}
@@ -195,6 +229,27 @@ seneca.ready(function (err) {
     })
   }
 
+  function testReadNoNamespace (args, done) {
+    // Initializes the data
+    var entity = {title: 'Security', content: '<h1>Security</h1><p>We don\'t want namespaces!</p>'}
+    // Calls the create action
+    act({role: role, cmd: 'create', entity: entity})
+    .then(function (result) {
+      // Checks result
+      assert.notEqual(result.entity.id, null)
+         // Calls the read action
+      act({role: role, cmd: 'read', id: result.entity.id, nonamespace: true})
+      .then(function (result) {
+        // Checks result
+        assert.ok(result.success)
+        assert.equal(result.entity.entity$, null)
+        assert.equal(result.entity.title, entity.title)
+        console.log('entity-crud: test_read_nonamespace successful.')
+        done(null, {success: true})
+      })
+    })
+  }
+
   function testReadNotFound (args, done) {
      // Calls the read action
     act({role: role, cmd: 'read', id: 'this-is-not-a-good-id'})
@@ -205,6 +260,8 @@ seneca.ready(function (err) {
       done(null, {success: true})
     })
   }
+
+  /* UPDATE */
 
   function testUpdate (args, done) {
     // Initializes the data
@@ -238,6 +295,41 @@ seneca.ready(function (err) {
     })
   }
 
+  function testUpdateNoNamespace (args, done) {
+    // Initializes the data
+    var content = 'Listen to this song written by David Bowie.'
+    var updateTitle = 'Life on Mars'
+    var updateTag = 'A tag'
+    var entity = {title: 'Life on Venus', content: content}
+    // Calls the create action
+    act({role: role, cmd: 'create', entity: entity})
+    .then(function (result) {
+         // Checks result
+      assert.notEqual(result.entity.id, null)
+        // Calls the update action
+      var updateEntity = {id: result.entity.id, title: updateTitle, tag: updateTag}
+      act({role: role, cmd: 'update', entity: updateEntity, nonamespace: true})
+      .then(function (result) {
+             // Checks result
+        assert.ok(result.success)
+        assert.equal(result.entity.entity$, null)
+          // Calls the read action
+        act({role: role, cmd: 'read', id: result.entity.id})
+        .then(function (result) {
+          // Checks result
+          assert.ok(result.success)
+          assert.equal(result.entity.title, updateTitle)
+          assert.equal(result.entity.content, content)
+          assert.equal(result.entity.tag, updateTag)
+          console.log('entity-crud: test_update_nonamespace successful.')
+          done(null, {success: true})
+        })
+      })
+    })
+  }
+
+  /* DELETE */
+
   function testDelete (args, done) {
     // Initializes the data
     var entity = {title: 'I want to be removed', content: 'Goodbye Cruel World.'}
@@ -263,6 +355,8 @@ seneca.ready(function (err) {
       })
     })
   }
+
+  /* TRUNCATE */
 
   function testTruncate (args, done) {
      // Calls the create action
@@ -292,6 +386,8 @@ seneca.ready(function (err) {
       })
     })
   }
+
+  /* QUERY */
 
   function testQuery (args, done) {
      // Calls the truncate action
@@ -363,6 +459,45 @@ seneca.ready(function (err) {
             // Returns success
             done(null, {success: true})
           })
+        })
+      })
+    })
+  }
+
+  function testQueryNoNamespace (args, done) {
+     // Calls the truncate action
+    act({role: role, cmd: 'truncate'})
+    .then(function (result) {
+        // Checks result
+      assert.ok(result.success)
+      // Creates data
+      var posts = [
+        {title: 'The life of cats', content: '<h1>This is a great post about cats</h1><p>Maoww</p>'},
+        {title: 'Monday', content: 'The week begins!'},
+        {title: 'Tuesday', content: 'Ruby tuesday?'},
+        {title: 'Life on Mars', content: 'Listen to this song written by David Bowie.'},
+        {title: 'Tuesday', content: 'The week continues...'}
+      ]
+      var cmds = []
+      posts.forEach(function (item) {
+        var command = act({role: role, cmd: 'create', entity: item})
+        cmds.push(command)
+      })
+      promise.all(cmds)
+      .then(function (results) {
+        // Retrieves all data
+        act({role: role, cmd: 'query', nonamespace: true})
+        .then(function (result) {
+               // Checks result
+          assert.ok(result.success)
+          assert.equal(result.list.length, posts.length)
+          assert.equal(result.count, posts.length)
+          result.list.forEach(function (item) {
+            assert.equal(item.entity$, null)
+          })
+          console.log('entity-crud: test_query_nonamespace successful.')
+          // Returns success
+          done(null, {success: true})
         })
       })
     })

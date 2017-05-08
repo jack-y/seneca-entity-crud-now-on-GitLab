@@ -104,6 +104,10 @@ module.exports = function (options) {
       var entityFactory = seneca.make$(zone, base, name)
       entityFactory.save$(entity, function (err, entity) {
         if (err) { throw err }
+        // Removes the namespace
+        if (args.nonamespace) {
+          delete entity.entity$
+        }
         // Returns the new entity with id set
         done(null, {success: true, errors: [], entity: entity})
       })
@@ -127,6 +131,10 @@ module.exports = function (options) {
       if (err) { throw err }
       // Checks if the entity is found
       var success = entity !== null
+      // Removes the namespace
+      if (args.nonamespace) {
+        delete entity.entity$
+      }
       // Checks if joins are requested
       var joinsList = args.joins ? args.joins : null
       if (success && joinsList) {
@@ -204,6 +212,10 @@ module.exports = function (options) {
         // Saves the entity in the database
         entityFactory.save$(readEntity, function (err, updatedEntity) {
           if (err) { throw err }
+          // Removes the namespace
+          if (args.nonamespace) {
+            delete updatedEntity.entity$
+          }
           // Returns the updated entity
           return done(null, {success: true, errors: errors, entity: updatedEntity})
         })
@@ -290,6 +302,12 @@ module.exports = function (options) {
         // Loops on each deep select
         deepSelect.forEach(function (item) {
           deepList = selectDeep(deepList, item)
+        })
+      }
+      // Removes the namespace
+      if (args.nonamespace && deepList.length > 0) {
+        deepList.forEach(function (item) {
+          delete item.entity$
         })
       }
       // Checks if joins are requested
@@ -416,7 +434,7 @@ module.exports = function (options) {
       var id = originEntity[join.idname]
       var fieldname = join.resultname ? join.resultname : join.role
       // Reads the entity by its ID
-      act({role: join.role, zone: zone, base: base, name: name, cmd: 'read', id: id, joins: join.joins})
+      act({role: join.role, zone: zone, base: base, name: name, cmd: 'read', id: id, joins: join.joins, nonamespace: join.nonamespace})
       .then(function (result) {
         if (result.success) {
           // Adds the result to the origin entity

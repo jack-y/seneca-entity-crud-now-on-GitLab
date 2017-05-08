@@ -40,18 +40,30 @@ seneca.ready(function (err) {
 
   /* Actions */
   seneca.add({role: role, cmd: 'test_simple_joins'}, testSimpleJoins)
+  seneca.add({role: role, cmd: 'test_simple_joins_nonamespace'}, testSimpleJoinsNoNamespace)
   seneca.add({role: role, cmd: 'test_multi_joins'}, testMultiJoins)
+  seneca.add({role: role, cmd: 'test_multi_joins_nonamespace'}, testMultiJoinsNoNamespace)
   seneca.add({role: role, cmd: 'test_query_joins'}, testQueryJoins)
+  seneca.add({role: role, cmd: 'test_query_joins_nonamespace'}, testQueryJoinsNoNamespace)
 
   /* Run tests */
   act({role: role, cmd: 'test_simple_joins'})
   .then(function (result) {
-    act({role: role, cmd: 'test_multi_joins'})
+    act({role: role, cmd: 'test_simple_joins_nonamespace'})
     .then(function (result) {
-      act({role: role, cmd: 'test_query_joins'})
+      act({role: role, cmd: 'test_multi_joins'})
       .then(function (result) {
-        console.log('entity-crud: joins tests successful.')
-        return result
+        act({role: role, cmd: 'test_multi_joins_nonamespace'})
+        .then(function (result) {
+          act({role: role, cmd: 'test_query_joins'})
+          .then(function (result) {
+            act({role: role, cmd: 'test_query_joins_nonamespace'})
+            .then(function (result) {
+              console.log('entity-crud: joins tests successful.')
+              return result
+            })
+          })
+        })
       })
     })
   })
@@ -72,6 +84,28 @@ seneca.ready(function (err) {
         .then(function (result) {
           assert.equal(result.entity.brand.name, brand.name)
           console.log('entity-crud: test_simple_joins successful.')
+          done(null, {success: true})
+        })
+      })
+    })
+  }
+
+  function testSimpleJoinsNoNamespace (args, done) {
+    /* Creates entities */
+    act({role: role, cmd: 'create', entity: brand})
+    .then(function (result) {
+      brand.id = result.entity.id
+      guitar.id_brand = brand.id
+      act({role: role, cmd: 'create', entity: guitar})
+      .then(function (result) {
+        guitar.id = result.entity.id
+        /* Reads guitar with joins */
+        act({role: role, cmd: 'read', id: guitar.id, joins: [{role: role, idname: 'id_brand', resultname: 'brand', nonamespace: true}]})
+        .then(function (result) {
+          assert.equal(result.entity.brand.name, brand.name)
+          assert.notEqual(result.entity.entity$, null)
+          assert.equal(result.entity.brand.entity$, null)
+          console.log('entity-crud: test_simple_joins_nonamespace successful.')
           done(null, {success: true})
         })
       })
@@ -132,6 +166,65 @@ seneca.ready(function (err) {
     })
   }
 
+  function testMultiJoinsNoNamespace (args, done) {
+    /* Resets the database */
+    act({role: role, cmd: 'truncate'})
+    .then(function (result) {
+      /* Creates entities */
+      brand = {name: 'Gibson'}
+      guitar = {name: 'DeLuxe'}
+      /* Creates city */
+      act({role: role, cmd: 'create', entity: city})
+      .then(function (result) {
+        city = result.entity
+        /* Creates supplier */
+        supplier.id_city = city.id
+        act({role: role, cmd: 'create', entity: supplier})
+        .then(function (result) {
+          supplier = result.entity
+          /* Creates brand */
+          guitar.id_supplier = supplier.id
+          act({role: role, cmd: 'create', entity: brand})
+          .then(function (result) {
+            brand = result.entity
+            /* Creates guitar */
+            guitar.id_supplier = supplier.id
+            guitar.id_brand = brand.id
+            act({role: role, cmd: 'create', entity: guitar})
+            .then(function (result) {
+              guitar = result.entity
+              /* Reads guitar with multi joins */
+              act({
+                role: role,
+                cmd: 'read',
+                id: guitar.id,
+                nonamespace: true,
+                joins: [
+                  {role: role, idname: 'id_brand', resultname: 'brand'},
+                  {
+                    role: role,
+                    idname: 'id_supplier',
+                    resultname: 'supplier',
+                    joins: [{role: role, idname: 'id_city', resultname: 'city', nonamespace: true}]
+                  }
+                ]
+              })
+              .then(function (result) {
+                assert.equal(result.entity.supplier.city.zicode, city.zicode)
+                assert.equal(result.entity.entity$, null)
+                assert.notEqual(result.entity.brand.entity$, null)
+                assert.notEqual(result.entity.supplier.entity$, null)
+                assert.equal(result.entity.supplier.city.entity$, null)
+                console.log('entity-crud: test_multi_joins_nonamespace successful.')
+                done(null, {success: true})
+              })
+            })
+          })
+        })
+      })
+    })
+  }
+
   function testQueryJoins (args, done) {
     /* Resets the database */
     act({role: role, cmd: 'truncate'})
@@ -167,6 +260,52 @@ seneca.ready(function (err) {
                     }
                   })
                   console.log('entity-crud: test_query_joins successful.')
+                  done(null, {success: true})
+                })
+              })
+            })
+          })
+        })
+      })
+    })
+  }
+
+  function testQueryJoinsNoNamespace (args, done) {
+    /* Resets the database */
+    act({role: role, cmd: 'truncate'})
+    .then(function (result) {
+      /* Creates entities */
+      var brand01 = {name: 'Gibson'}
+      var brand02 = {name: 'Fender'}
+      var guitar01 = {name: 'DeLuxe', type: 'Electric'}
+      var guitar02 = {name: 'Stratocaster', type: 'Electric'}
+      var guitar03 = {name: 'Folk', type: 'Acoustic'}
+      act({role: role, cmd: 'create', entity: brand01})
+      .then(function (result) {
+        guitar01.id_brand = result.entity.id
+        act({role: role, cmd: 'create', entity: brand02})
+        .then(function (result) {
+          guitar02.id_brand = result.entity.id
+          guitar03.id_brand = result.entity.id
+          act({role: role, cmd: 'create', entity: guitar01})
+          .then(function (result) {
+            act({role: role, cmd: 'create', entity: guitar02})
+            .then(function (result) {
+              act({role: role, cmd: 'create', entity: guitar03})
+              .then(function (result) {
+                act({role: role, cmd: 'query', select: {type: 'Electric'}, joins: [{role: role, idname: 'id_brand', resultname: 'brand', nonamespace: true}]})
+                .then(function (result) {
+                  assert.equal(result.list.length, 2)
+                  result.list.forEach(function (guitar, index) {
+                    assert.equal(guitar.brand.entity$, null)
+                    if (guitar.name === 'DeLuxe') {
+                      assert.equal(guitar.brand.name, 'Gibson')
+                    }
+                    if (guitar.name === 'Stratocaster') {
+                      assert.equal(guitar.brand.name, 'Fender')
+                    }
+                  })
+                  console.log('entity-crud: test_query_joins_nonamespace successful.')
                   done(null, {success: true})
                 })
               })

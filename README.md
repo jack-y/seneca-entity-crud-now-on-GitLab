@@ -3,7 +3,7 @@
 
 # seneca-entity-crud
 
-Last update: 04/23/2017  
+Last update: 05/08/2017
 
 ## Description
 
@@ -60,6 +60,7 @@ And we even lie on the floor:
 - This plugin includes an optional input data validation functionality to be used before the create or update action.
 - A `last_update` date value can be automatically added to each entity when created or updated.
 - The [joins][] feature provides deep readings from IDs contained in entities.
+- For security, using the optional `nonamespace: true` argument, the namespace of the resulting entities is automatically removed.
 
 Enjoy!
 
@@ -261,6 +262,24 @@ errors: [{"field":"title","actual":null,"error":"the title is required"}]
 
 and the message `This message will never be shown.` ...will never be shown ;).
 
+## The returned namespace
+
+By default, the **entity$** field of the resulting entities contains the entity namespace `zone-base-name`. For security reasons, sensitive applications may not need this data. To automatically remove the resulting entity namespace, use the `nonamespace: true` argument in the command. 
+
+### Example
+
+```js
+var myId = '5a4732ef4049cfcb07d992007e003932'
+// Read
+act({role: 'my-role', cmd: 'read', id: myId, nonamespace: true})
+.then(function (result) {
+  // No entity$ namespace zone-base-name in the result entity
+  console.log('My entity is: ' + JSON.stringify(result.entity))
+  return result
+})
+```
+For more information on zone, base and name, see the [entity namespace][] tutorial.
+
 # API commands specifications
 
 ## create
@@ -273,9 +292,11 @@ Use this command to add a new entity into your database. The pattern is:
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
+You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
+
 `validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: [Input data validation](#input-data-validation).
 
-Example:
+### Example
 
 ```js
 var myEntity = {title: 'The life of cats', content: '<h1>This is a post about cats</h1><p>Maoww...</p>'}
@@ -287,7 +308,7 @@ act({role: 'my-role', cmd: 'create', entity: myEntity)
 })
 ```
 
-The result object contains these values:
+### Result object
 
 - **success**: `true` or `false`. `false` is returned if the input data validation is used and fail.
 - **errors**: an array. If the input data validation is used and fail, `errors` is the array of error objects. An exemple of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
@@ -305,9 +326,11 @@ Use this command to retrieve an entity from your database. The pattern is:
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
+You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
+
 You can pass a `joins` value to process deep reading from IDs contained in the entity. See the [joins][] feature.
 
-Example:
+### Example
 
 ```js
 var myId = '5a4732ef4049cfcb07d992007e003932'
@@ -319,7 +342,7 @@ act({role: 'my-role', cmd: 'read', id: myId})
 })
 ```
 
-The result object contains these values:
+### Result object
 
 - **success**: `true` or `false`. `false` is returned if the entity is not found.
 - **entity**: the entity read from the database, or null if it is not found.
@@ -334,11 +357,13 @@ Use this command to update an entity previously inserted into your database. The
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
+You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
+
 `validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: [Input data validation](#input-data-validation).
 
 The entity ID must be found in the database. If not, a `success: false` result is fired.
 
-Not all fields must always be updated in the past entity as an argument. Only the ID and fields to be updated or inserted are required. However, depending on the used store plugin, the **save** seneca-entity action can remove undeclared fields from the database. To avoid this, the **update** command is equal to a read-assign-save action. Undeclared fields remain unchanged.
+Not all fields must always be updated in the past entity as an argument. Only the ID and fields to be updated or inserted are required. However, depending on the used store plugin, the **save$** seneca-entity action can remove undeclared fields from the database. To avoid this, the **update** command is equal to a read-assign-save action. Undeclared fields remain unchanged.
 
 Updating or inserting fields uses the `assign` javascript function, like:
 
@@ -348,7 +373,7 @@ Update command entity: {id: '1234', phone: 0001, email: 'me@server.com'}
 -> Final database entity: {id:'1234', name: 'John Doe', phone: 0001, email: 'me@server.com'}
 ```
 
-Example of an **update** call:
+### Example
 
 ```js
 var myEntity = {id: '5a4732ef4049cfcb07d992007e003932', title: 'A new title', content: '<h1>This is a post about cats</h1><p>Maoww...</p>'}
@@ -360,11 +385,12 @@ act({role: 'my-role', cmd: 'update', entity: myEntity})
 })
 ```
 
-The result object contains these values:
+### Result object
 
 - **success**: `true` or `false`. `false` is returned if the input data validation is used and fail, or if the entity ID is not found.
 - **errors**: an array. If the input data validation is used and fail, `errors` is the array of error objects. An example of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
 - **entity**: if there is no data validation or if it has succeeded, this value is the input entity updated. If the `last_update` plugin option is set to `true`, this value has its `last_update` field set with the current date.
+
 
 ## delete
 
@@ -376,7 +402,7 @@ Use this command to remove an entity from your database. The pattern is:
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
-Example:
+### Example
 
 ```js
 var myId = '5a4732ef4049cfcb07d992007e003932'
@@ -388,7 +414,7 @@ act({role: 'my-role', cmd: 'delete', id: myId})
 })
 ```
 
-The result object contains this value:
+### Result object
 
 - **success**: `true`.
 
@@ -402,7 +428,7 @@ Use this command to remove all the entities from your database. The pattern is:
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
-Example:
+### Example
 
 ```js
 // Truncate
@@ -413,7 +439,7 @@ act({role: 'my-role', cmd: 'truncate'})
 })
 ```
 
-The result object contains this value:
+### Result object
 
 - **success**: `true`.
 
@@ -450,6 +476,8 @@ Use this command to retrieve a list of entities from your database. The pattern 
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
+You can pass a `nonamespace: true` argument to remove the namespace of the resulting entities. See the previous chapter: [The returned namespace](#the-returned-namespace).
+
 You can pass a `joins` value to process deep reading from IDs contained in the entities. See the [joins][] feature.
 
 ### select
@@ -467,7 +495,7 @@ A **select** optional argument can be added to the pattern: `select: {... some f
 
 For more information, see the seneca [Query Syntax][] tutorial.
 
-Example:
+### select example
 
 ```js
 var mySelect = {title: 'About seneca'}
@@ -485,7 +513,7 @@ A **deepselect** optional argument can be added to the pattern. If no `deepselec
 
 A deep select filter is a JSON string with a property name, and a value the property must match. This is a useful search feature on nested objects.
 
-Example:
+### deep select example
 
 ```js
 var myDeepSelect = [
@@ -503,9 +531,7 @@ In this example, only the entities whose city contains the zip code `'59491'` ar
 
 You can use together the select and deep select filters as you want.
 
-### result object
-
-The result object contains these values:
+### Result object
 
 - **success**: `true`.
 - **list**: the entities array, according to the filters. If no entity match the filters, an empty array is returned.
@@ -523,7 +549,7 @@ You can pass `base`, `zone` and `name` of your entity namespace as optional argu
 
 As the query command, the count command can use select and deep select filters. See the previous [query command](#query) for more explanations.
 
-Example:
+### Example
 
 ```js
 var mySelect = {title: 'About seneca'}
@@ -538,7 +564,7 @@ act({role: 'my-role', cmd: 'count', select: mySelect, deepselect: myDeepSelect})
 })
 ```
 
-The result object contains these values:
+### Result object
 
 - **success**: `true`.
 - **count**: the number of entities, according to the filters. If no entity match the filters, the `0` value is returned.
@@ -578,4 +604,4 @@ Licensed under [MIT][].
 [shortid]: https://cnpmjs.org/package/shortid
 [Query syntax]: http://senecajs.org/docs/tutorials/understanding-query-syntax.html
 [seneca mesh]: https://github.com/senecajs/seneca-mesh
-[joins]: https://github.com/jack-y/seneca-entity-crud/tree/master/joins
+[joins]: https://github.com/jack-y/seneca-entity-crud/blob/master/joins/README.md
