@@ -59,6 +59,7 @@ seneca.ready(function (err) {
   seneca.add({role: role, cmd: 'test_create_validation_ok'}, testCreateValidationOk)
   seneca.add({role: role, cmd: 'test_create'}, testCreate)
   seneca.add({role: role, cmd: 'test_create_nonamespace'}, testCreateNoNamespace)
+  seneca.add({role: role, cmd: 'test_create_nonamespace_string_arg'}, testCreateNoNamespaceStringArg)
   seneca.add({role: role, cmd: 'test_read'}, testRead)
   seneca.add({role: role, cmd: 'test_read_nonamespace'}, testReadNoNamespace)
   seneca.add({role: role, cmd: 'test_read_not_found'}, testReadNotFound)
@@ -83,28 +84,31 @@ seneca.ready(function (err) {
           .then(function (result) {
             act({role: role, cmd: 'test_create_nonamespace'})
             .then(function (result) {
-              act({role: role, cmd: 'test_read'})
+              act({role: role, cmd: 'test_create_nonamespace_string_arg'})
               .then(function (result) {
-                act({role: role, cmd: 'test_read_nonamespace'})
+                act({role: role, cmd: 'test_read'})
                 .then(function (result) {
-                  act({role: role, cmd: 'test_read_not_found'})
+                  act({role: role, cmd: 'test_read_nonamespace'})
                   .then(function (result) {
-                    act({role: role, cmd: 'test_update'})
+                    act({role: role, cmd: 'test_read_not_found'})
                     .then(function (result) {
-                      act({role: role, cmd: 'test_update_nonamespace'})
+                      act({role: role, cmd: 'test_update'})
                       .then(function (result) {
-                        act({role: role, cmd: 'test_delete'})
+                        act({role: role, cmd: 'test_update_nonamespace'})
                         .then(function (result) {
-                          act({role: role, cmd: 'test_truncate'})
+                          act({role: role, cmd: 'test_delete'})
                           .then(function (result) {
-                            act({role: role, cmd: 'test_query'})
+                            act({role: role, cmd: 'test_truncate'})
                             .then(function (result) {
-                              act({role: role, cmd: 'test_query_nonamespace'})
+                              act({role: role, cmd: 'test_query'})
                               .then(function (result) {
-                                act({role: role, cmd: 'test_deep_query'})
+                                act({role: role, cmd: 'test_query_nonamespace'})
                                 .then(function (result) {
-                                  console.log('entity-crud: tests successful.')
-                                  return result
+                                  act({role: role, cmd: 'test_deep_query'})
+                                  .then(function (result) {
+                                    console.log('entity-crud: tests successful.')
+                                    return result
+                                  })
                                 })
                               })
                             })
@@ -203,6 +207,22 @@ seneca.ready(function (err) {
       assert.notEqual(result.entity.id, null)
       assert.notEqual(result.entity.last_update, null)
       console.log('entity-crud: test_create_nonamespace successful.')
+      done(null, {success: true})
+    })
+  }
+
+  function testCreateNoNamespaceStringArg (args, done) {
+    // Initializes the data
+    var entity = {title: 'Security', content: '<h1>Security</h1><p>We don\'t want namespaces!</p>'}
+    // Calls the create action
+    act({role: role, cmd: 'create', entity: entity, nonamespace: 'true'})
+    .then(function (result) {
+      // Checks result
+      assert.ok(result.success)
+      assert.equal(result.entity.entity$, null)
+      assert.notEqual(result.entity.id, null)
+      assert.notEqual(result.entity.last_update, null)
+      console.log('entity-crud: test_create_nonamespace_string_arg successful.')
       done(null, {success: true})
     })
   }

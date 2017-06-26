@@ -105,7 +105,7 @@ module.exports = function (options) {
       entityFactory.save$(entity, function (err, entity) {
         if (err) { throw err }
         // Removes the namespace
-        if (args.nonamespace) {
+        if (args.nonamespace || args.nonamespace === 'true') {
           delete entity.entity$
         }
         // Returns the new entity with id set
@@ -132,7 +132,7 @@ module.exports = function (options) {
       // Checks if the entity is found
       var success = entity !== null
       // Removes the namespace
-      if (args.nonamespace) {
+      if (args.nonamespace || args.nonamespace === 'true') {
         delete entity.entity$
       }
       // Checks if joins are requested
@@ -213,7 +213,7 @@ module.exports = function (options) {
         entityFactory.save$(readEntity, function (err, updatedEntity) {
           if (err) { throw err }
           // Removes the namespace
-          if (args.nonamespace) {
+          if (args.nonamespace || args.nonamespace === 'true') {
             delete updatedEntity.entity$
           }
           // Returns the updated entity
@@ -305,7 +305,7 @@ module.exports = function (options) {
         })
       }
       // Removes the namespace
-      if (args.nonamespace && deepList.length > 0) {
+      if ((args.nonamespace || args.nonamespace === 'true') && deepList.length > 0) {
         deepList.forEach(function (item) {
           delete item.entity$
         })
