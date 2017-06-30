@@ -3,7 +3,7 @@
 
 # seneca-entity-crud
 
-Last update: 05/08/2017
+Last update: 06/30/2017
 
 ## Description
 
@@ -61,6 +61,7 @@ And we even lie on the floor:
 - A `last_update` date value can be automatically added to each entity when created or updated.
 - The [joins][] feature provides deep readings from IDs contained in entities.
 - For security, using the optional `nonamespace: true` argument, the namespace of the resulting entities is automatically removed.
+- Defaults can be added to the resulting entities.
 
 Enjoy!
 
@@ -262,9 +263,11 @@ errors: [{"field":"title","actual":null,"error":"the title is required"}]
 
 and the message `This message will never be shown.` ...will never be shown ;).
 
-## The returned namespace
+# The returned namespace
 
-By default, the **entity$** field of the resulting entities contains the entity namespace `zone-base-name`. For security reasons, sensitive applications may not need this data. To automatically remove the resulting entity namespace, use the `nonamespace: true` argument in the command. 
+By default, the **entity$** field of the resulting entities contains the entity namespace `zone-base-name`. For security reasons, sensitive applications may not need this data. To automatically remove the resulting entity namespace, use the `nonamespace: true` argument in the command.
+
+> Note: for convenience, the `nonamespace` argument value can be the `true` boolean or the `'true'` string.
 
 ### Example
 
@@ -279,6 +282,51 @@ act({role: 'my-role', cmd: 'read', id: myId, nonamespace: true})
 })
 ```
 For more information on zone, base and name, see the [entity namespace][] tutorial.
+
+
+# Defaults
+
+This plugin can automatically add defaults to the resulting entities of a [read](#read) or [query](#query) command.
+
+> Note: this feature is optional.
+
+The defaults argument is an object.
+Each object key/value pair is a default field name/value pair:
+
+```js
+{'a field name': <a default value>, 'another field name': <another default value>, ...}
+```
+
+If the resulting entity does not contain the field `a field name`, it is added with the default value.
+If the resulting entity already contains the field `a field name`, nothing is changed.
+
+### How it works
+
+Add the defaults object to the [read](#read) or [query](#query) command pattern:
+
+```js
+{role: 'my-role', cmd: 'read', id: anId, defaults: { ... }}
+{role: 'my-role', cmd: 'query', defaults: { ... }}
+```
+
+### Example
+
+```js
+var myId = '5a4732ef4049cfcb07d992007e003932'
+// Read
+act({role: 'my-role', cmd: 'read', id: myId, defaults: {country: 'Belgium', currency: 'Euro'})
+.then(function (result) {
+  console.log('My entity is: ' + JSON.stringify(result.entity))
+  return result
+})
+```
+
+The console output looks like:
+
+```js
+{id: '5a4732ef4049cfcb07d992007e003932', ... , country: 'Belgium', currency: 'Euro'}
+```
+
 
 # API commands specifications
 
@@ -327,6 +375,8 @@ Use this command to retrieve an entity from your database. The pattern is:
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
 You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
+
+You can pass a `defaults` argument to add defaults to the resulting entity. See the previous chapter: [Defaults](#defaults).
 
 You can pass a `joins` value to process deep reading from IDs contained in the entity. See the [joins][] feature.
 
@@ -477,6 +527,8 @@ Use this command to retrieve a list of entities from your database. The pattern 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
 You can pass a `nonamespace: true` argument to remove the namespace of the resulting entities. See the previous chapter: [The returned namespace](#the-returned-namespace).
+
+You can pass a `defaults` argument to add defaults to the resulting entities. See the previous chapter: [Defaults](#defaults).
 
 You can pass a `joins` value to process deep reading from IDs contained in the entities. See the [joins][] feature.
 

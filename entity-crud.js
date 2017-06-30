@@ -124,6 +124,8 @@ module.exports = function (options) {
     var zone = args.zone ? args.zone : options.zone
     var base = args.base ? args.base : options.base
     var name = args.name ? args.name : options.name
+    // Gets the optional defaults
+    var defaults = args.defaults ? args.defaults : {}
     // Gets the entity factory
     var entityFactory = seneca.make$(zone, base, name)
     // Reads the entity in the database
@@ -134,6 +136,14 @@ module.exports = function (options) {
       // Removes the namespace
       if (args.nonamespace || args.nonamespace === 'true') {
         delete entity.entity$
+      }
+      // Adds the defaults
+      if (success && defaults) {
+        for (let defaultName in defaults) {
+          if (!entity[defaultName]) {
+            entity[defaultName] = defaults[defaultName]
+          }
+        }
       }
       // Checks if joins are requested
       var joinsList = args.joins ? args.joins : null
@@ -286,6 +296,8 @@ module.exports = function (options) {
     var zone = args.zone ? args.zone : options.zone
     var base = args.base ? args.base : options.base
     var name = args.name ? args.name : options.name
+    // Gets the optional defaults
+    var defaults = args.defaults ? args.defaults : {}
     // Gets the entity factory
     var entityFactory = seneca.make$(zone, base, name)
     // Gets the query options
@@ -309,6 +321,16 @@ module.exports = function (options) {
         deepList.forEach(function (item) {
           delete item.entity$
         })
+      }
+      // Adds the defaults
+      if (defaults) {
+        for (let defaultName in defaults) {
+          deepList.forEach(function (item) {
+            if (!item[defaultName]) {
+              item[defaultName] = defaults[defaultName]
+            }
+          })
+        }
       }
       // Checks if joins are requested
       var joinsList = args.joins ? args.joins : null

@@ -1,4 +1,4 @@
-/* Copyright (c) 2016 e-soa Jacques Desodt */
+/* Copyright (c) 2016-2017 e-soa Jacques Desodt */
 'use strict'
 
 /* Default plugin options */
@@ -61,6 +61,7 @@ seneca.ready(function (err) {
   seneca.add({role: role, cmd: 'test_create_nonamespace'}, testCreateNoNamespace)
   seneca.add({role: role, cmd: 'test_create_nonamespace_string_arg'}, testCreateNoNamespaceStringArg)
   seneca.add({role: role, cmd: 'test_read'}, testRead)
+  seneca.add({role: role, cmd: 'test_read_defaults'}, testReadDefaults)
   seneca.add({role: role, cmd: 'test_read_nonamespace'}, testReadNoNamespace)
   seneca.add({role: role, cmd: 'test_read_not_found'}, testReadNotFound)
   seneca.add({role: role, cmd: 'test_update'}, testUpdate)
@@ -68,6 +69,7 @@ seneca.ready(function (err) {
   seneca.add({role: role, cmd: 'test_delete'}, testDelete)
   seneca.add({role: role, cmd: 'test_truncate'}, testTruncate)
   seneca.add({role: role, cmd: 'test_query'}, testQuery)
+  seneca.add({role: role, cmd: 'test_query_defaults'}, testQueryDefaults)
   seneca.add({role: role, cmd: 'test_query_nonamespace'}, testQueryNoNamespace)
   seneca.add({role: role, cmd: 'test_deep_query'}, testDeepQuery)
 
@@ -88,26 +90,32 @@ seneca.ready(function (err) {
               .then(function (result) {
                 act({role: role, cmd: 'test_read'})
                 .then(function (result) {
-                  act({role: role, cmd: 'test_read_nonamespace'})
+                  act({role: role, cmd: 'test_read_defaults'})
                   .then(function (result) {
-                    act({role: role, cmd: 'test_read_not_found'})
+                    act({role: role, cmd: 'test_read_nonamespace'})
                     .then(function (result) {
-                      act({role: role, cmd: 'test_update'})
+                      act({role: role, cmd: 'test_read_not_found'})
                       .then(function (result) {
-                        act({role: role, cmd: 'test_update_nonamespace'})
+                        act({role: role, cmd: 'test_update'})
                         .then(function (result) {
-                          act({role: role, cmd: 'test_delete'})
+                          act({role: role, cmd: 'test_update_nonamespace'})
                           .then(function (result) {
-                            act({role: role, cmd: 'test_truncate'})
+                            act({role: role, cmd: 'test_delete'})
                             .then(function (result) {
-                              act({role: role, cmd: 'test_query'})
+                              act({role: role, cmd: 'test_truncate'})
                               .then(function (result) {
-                                act({role: role, cmd: 'test_query_nonamespace'})
+                                act({role: role, cmd: 'test_query'})
                                 .then(function (result) {
-                                  act({role: role, cmd: 'test_deep_query'})
+                                  act({role: role, cmd: 'test_query_defaults'})
                                   .then(function (result) {
-                                    console.log('entity-crud: tests successful.')
-                                    return result
+                                    act({role: role, cmd: 'test_query_nonamespace'})
+                                    .then(function (result) {
+                                      act({role: role, cmd: 'test_deep_query'})
+                                      .then(function (result) {
+                                        console.log('entity-crud: tests successful.')
+                                        return result
+                                      })
+                                    })
                                   })
                                 })
                               })
@@ -231,7 +239,7 @@ seneca.ready(function (err) {
 
   function testRead (args, done) {
     // Initializes the data
-    var entity = {title: 'Life on Mars', content: 'Listen to this song written by  David Bowie.'}
+    var entity = {title: 'Life on Mars', content: 'Listen to this song written by David Bowie.'}
     // Calls the create action
     act({role: role, cmd: 'create', entity: entity})
     .then(function (result) {
@@ -244,6 +252,30 @@ seneca.ready(function (err) {
         assert.ok(result.success)
         assert.equal(result.entity.title, entity.title)
         console.log('entity-crud: test_read successful.')
+        done(null, {success: true})
+      })
+    })
+  }
+
+  function testReadDefaults (args, done) {
+    // Initializes the data
+    var content = 'Listen to this song written by David Bowie.'
+    var release = 1971
+    var entity = {title: 'Life on Mars', content: content}
+    // Calls the create action
+    act({role: role, cmd: 'create', entity: entity})
+    .then(function (result) {
+      // Checks result
+      assert.notEqual(result.entity.id, null)
+         // Calls the read action
+      act({role: role, cmd: 'read', id: result.entity.id, defaults: {content: 'default content', release: release}})
+      .then(function (result) {
+        // Checks result
+        assert.ok(result.success)
+        assert.equal(result.entity.title, entity.title)
+        assert.equal(result.entity.content, content)
+        assert.equal(result.entity.release, release)
+        console.log('entity-crud: test_read_defaults successful.')
         done(null, {success: true})
       })
     })
@@ -271,7 +303,7 @@ seneca.ready(function (err) {
   }
 
   function testReadNotFound (args, done) {
-     // Calls the read action
+    // Calls the read action
     act({role: role, cmd: 'read', id: 'this-is-not-a-good-id'})
     .then(function (result) {
          // Checks result
@@ -379,7 +411,7 @@ seneca.ready(function (err) {
   /* TRUNCATE */
 
   function testTruncate (args, done) {
-     // Calls the create action
+    // Calls the create action
     act({role: role, cmd: 'create', entity: {title: 't1', content: 'c1'}})
     .then(function (result) {
       // Calls the query action
@@ -410,7 +442,7 @@ seneca.ready(function (err) {
   /* QUERY */
 
   function testQuery (args, done) {
-     // Calls the truncate action
+    // Calls the truncate action
     act({role: role, cmd: 'truncate'})
     .then(function (result) {
         // Checks result
@@ -484,8 +516,100 @@ seneca.ready(function (err) {
     })
   }
 
+  function testQueryDefaults (args, done) {
+    // Initializes
+    var author = 'John Deuf'
+    var defaultAuthor = 'Mr Nobody'
+    var tuesday = 'Tuesday'
+    var defaultRelease = 2017
+    // Calls the truncate action
+    act({role: role, cmd: 'truncate'})
+    .then(function (result) {
+        // Checks result
+      assert.ok(result.success)
+      // Creates data
+      var posts = [
+        {title: 'The life of cats', content: '<h1>This is a great post about cats</h1><p>Maoww</p>'},
+        {title: 'Monday', content: 'The week begins!'},
+        {title: tuesday, content: 'Ruby tuesday?', author: author},
+        {title: 'Life on Mars', content: 'Listen to this song written by David Bowie.'},
+        {title: tuesday, content: 'The week continues...', author: author}
+      ]
+      var cmds = []
+      posts.forEach(function (item) {
+        var command = act({role: role, cmd: 'create', entity: item})
+        cmds.push(command)
+      })
+      promise.all(cmds)
+      .then(function (results) {
+        // Tuesday titles count
+        var tuesdayCount = 0
+        for (let post of posts) {
+          if (post.title === tuesday) {
+            tuesdayCount++
+          }
+        }
+        // Retrieves all data
+        act({role: role, cmd: 'query', defaults: {author: defaultAuthor, release: defaultRelease}})
+        .then(function (result) {
+          // Checks result
+          assert.ok(result.success)
+          assert.equal(result.list.length, posts.length)
+          assert.equal(result.count, posts.length)
+          return result
+        })
+        .then(function (result) {
+          // Checks defaults
+          result.list.forEach(function (item) {
+            if (item.title === tuesday) {
+              assert.equal(item.author, author)
+            } else {
+              assert.equal(item.author, defaultAuthor)
+            }
+            assert.equal(item.release, defaultRelease)
+          })
+          return result
+        })
+        .then(function (result) {
+          // Retrieves Tuesday titles
+          act({role: role, cmd: 'query', select: {title: tuesday}})
+          .then(function (result) {
+                 // Checks result
+            assert.ok(result.success)
+            assert.equal(result.list.length, tuesdayCount)
+            assert.equal(result.count, tuesdayCount)
+            return result
+          })
+        })
+        .then(function (result) {
+          // Sorts data
+          act({role: role, cmd: 'query', select: {sort$: {title: 1}}})
+          .then(function (result) {
+                 // Checks result
+            assert.ok(result.success)
+            assert.equal(result.count, posts.length)
+            assert.equal(result.list[0].title, 'Life on Mars')
+            return result
+          })
+        })
+        .then(function (result) {
+          // Count
+          act({role: role, cmd: 'count', select: {title: tuesday}})
+          .then(function (result) {
+            // Checks result
+            assert.ok(result.success)
+            assert.equal(result.count, tuesdayCount)
+            console.log('entity-crud: test_query_defaults successful.')
+            // Returns success
+            done(null, {success: true})
+          })
+        })
+      })
+    })
+  }
+
   function testQueryNoNamespace (args, done) {
-     // Calls the truncate action
+    // Calls the truncate action
     act({role: role, cmd: 'truncate'})
     .then(function (result) {
         // Checks result
@@ -524,7 +648,7 @@ seneca.ready(function (err) {
   }
 
   function testDeepQuery (args, done) {
-     // Calls the truncate action
+    // Calls the truncate action
     act({role: role, cmd: 'truncate'})
     .then(function (result) {
         // Checks result
