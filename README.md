@@ -3,7 +3,12 @@
 
 # seneca-entity-crud
 
-Last update: 06/30/2017
+Last update: 07/05/2017
+
+### July 2017: New feature: Relational Delete
+
+The **Relational Delete** feature provides deletion of a set of relational entities from a given entity.
+See this [readme][] file.
 
 ## Description
 
@@ -54,6 +59,7 @@ One very nice thing: in addition to CRUD, this plugin offers additional commands
 - The `truncate` command works as traditional SQL `TRUNCATE TABLE my_table`.
 - The `query` command encapsulate the `list$` function.
 - The `count` command encapsulate the `list$` function, but return only the count for network optimization.
+- The `deleterelationships` command extends the deletion of an entity to that of all its relations. See this [readme][] file.
 
 And we even lie on the floor:
 
@@ -160,6 +166,10 @@ In most cases, it's a best practice to validate input data before insert it in t
 ```js
 {role: role, cmd: 'create', entity: myEntity, validate: true, validate_function: myFunction}
 ```
+
+### Triggers
+
+You can also use [triggers][] before or after any operation.
 
 ### Rules for your validation function
 
@@ -441,7 +451,6 @@ act({role: 'my-role', cmd: 'update', entity: myEntity})
 - **errors**: an array. If the input data validation is used and fail, `errors` is the array of error objects. An example of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
 - **entity**: if there is no data validation or if it has succeeded, this value is the input entity updated. If the `last_update` plugin option is set to `true`, this value has its `last_update` field set with the current date.
 
-
 ## delete
 
 Use this command to remove an entity from your database. The pattern is:
@@ -460,6 +469,43 @@ var myId = '5a4732ef4049cfcb07d992007e003932'
 act({role: 'my-role', cmd: 'delete', id: myId})
 .then(function (result) {
   console.log('Id ' + myId + ' deleted.')
+  return result
+})
+```
+
+### Result object
+
+- **success**: `true`.
+
+## deleterelationships
+
+Use this command to remove all relationships of an entity from your database.
+For more explanations, see this [readme][] file.
+
+The pattern is:
+
+```js
+{
+  role: 'my-role',
+  cmd: 'deleterelationships',
+  deleteresult: { ... a result object ... },
+  id: 'an-id',
+  relationships: [ ... an array of relationships ... ]
+}
+```
+
+You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
+
+For more explanations, see this [readme][] file.
+
+### Example
+
+```js
+var myId = '5a4732ef4049cfcb07d992007e003932'
+// Delete
+act({role: 'my-role', cmd: 'deleterelationships', deleteresult: {success: true}, id: myId, relationships: myModel})
+.then(function (result) {
+  console.log('Id ' + myId + ' relationships deleted.')
   return result
 })
 ```
@@ -657,3 +703,5 @@ Licensed under [MIT][].
 [Query syntax]: http://senecajs.org/docs/tutorials/understanding-query-syntax.html
 [seneca mesh]: https://github.com/senecajs/seneca-mesh
 [joins]: https://github.com/jack-y/seneca-entity-crud/blob/master/joins/README.md
+[readme]: https://github.com/jack-y/seneca-entity-crud/blob/master/relationships/README.md
+[triggers]: https://github.com/jack-y/seneca-triggers

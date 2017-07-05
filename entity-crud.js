@@ -3,7 +3,7 @@
 
 /* Default plugin options */
 const pluginName = 'seneca-entity-crud'
-const config = require('./config/' + pluginName + '.js')
+const config = require('./config/' + pluginName)
 
 /* Prerequisites */
 const promise = require('bluebird')
@@ -34,6 +34,7 @@ module.exports = function (options) {
   seneca.add({role: options.role, cmd: 'delete'}, delet)  // The 'delete' function is already defined in Javascript
 
   /* other database actions */
+  seneca.add({role: options.role, cmd: 'deleterelationships'}, deleteRelationships)
   seneca.add({role: options.role, cmd: 'truncate'}, truncate)
   seneca.add({role: options.role, cmd: 'query'}, query)
   seneca.add({role: options.role, cmd: 'count'}, count)
@@ -257,6 +258,28 @@ module.exports = function (options) {
   }
 
   /**
+  * Delete relationships: deletes all relationships of an entity from its ID.
+  *
+  * This action can be trigerred by the main application.
+  * The prior action is an entity deletion from its ID.
+  * The name of the delete result argument is 'deleteresult'
+  *
+  * All the deletions are in asynchronous mode.
+  */
+  function deleteRelationships (args, done) {
+    // Checks if delete OK and relationships are set
+    if (args.deleteresult.success && args.relationships) {
+      // Loops on each relationship
+      args.relationships.forEach(function (aRelationship) {
+        deleteOneRelationship(args, aRelationship)
+      })
+      done(null, {success: true})
+    }
+    // Bad delete result or no relationship
+    done(null, {success: args.deleteresult.success})
+  }
+
+  /**
   * Truncate: deletes all the entities from the database.
   *
   * TODO: find another optimized process for big data.
@@ -404,6 +427,72 @@ module.exports = function (options) {
       return fetchFromObject(anObject[property.substring(0, _index)], property.substr(_index + 1))
     }
     return anObject[property]
+  }
+
+  /* --------------- RELATIONSHIPS --------------- */
+
+  /**
+  * Deletes one relationship in asynchronous mode
+  * The master ID is in the args
+  * The master may be already deleted
+  **/
+  function deleteOneRelationship (args, relationship) {
+    // Gets the namespace
+    var zone = relationship.location.zone ? relationship.location.zone : options.zone
+    var base = relationship.location.base ? relationship.location.base : options.base
+    var name = relationship.location.name ? relationship.location.name : options.name
+    // Sets the query select to find relational entities
+    var select = {}
+    select[relationship.in_idname] = args.id
+    // Finds the relational entities
+    act({role: relationship.location.role, zone: zone, base: base, name: name, cmd: 'query', select})
+    .then(function (result) {
+      // Checks if query OK
+      if (result.success) {
+        // Loops on each relationship data
+        result.list.forEach(function (item) {
+          // Deletes one relationship data in asynchronous mode
+          deleteOneRelationshipData(item, relationship)
+        })
+      }
+    })
+  }
+
+  /**
+  * Deletes one relationship data in asynchronous mode
+  **/
+  function deleteOneRelationshipData (item, relationship) {
+    // Gets the namespace
+    var zone = relationship.location.zone ? relationship.location.zone : options.zone
+    var base = relationship.location.base ? relationship.location.base : options.base
+    var name = relationship.location.name ? relationship.location.name : options.name
+    // Deletes the relationship data in asynchronous mode
+    seneca.act({role: relationship.location.role, zone: zone, base: base, name: name, cmd: 'delete', id: item.id})
+    // Gets the slave entity ID
+    var outId = item[relationship.out.idname]
+    // Gets the out namespace
+    var outZone = relationship.out.location.zone ? relationship.out.location.zone : options.zone
+    var outBase = relationship.out.location.base ? relationship.out.location.base : options.base
+    var outName = relationship.out.location.name ? relationship.out.location.name : options.name
+    // Checks if relationship slave must also be deleted
+    if (relationship.out.delete) {
+    // Asynchronous slave delete: no return
+      seneca.act({role: relationship.out.location.role, zone: outZone, base: outBase, name: outName, cmd: 'delete', id: outId})
+    }
+    // RECURSION: Checks if a subrelationship exists
+    if (relationship.relationships) {
+      // Fires the subrelationship deletion in asynchronous mode
+      seneca.act({
+        role: relationship.out.location.role,
+        zone: outZone,
+        base: outBase,
+        name: outName,
+        cmd: 'deleterelationships',
+        id: outId,
+        deleteresult: {success: true}, // needed for the action
+        relationships: relationship.relationships
+      })
+    }
   }
 
   /* --------------- JOINS --------------- */
