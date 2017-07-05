@@ -155,7 +155,7 @@ All the work is done with these few lines:
 seneca.act({role: 'entity-crud-test', name: 'brand', cmd: 'delete', id: idFender}, function (err, result) {
   if (err) return console.error(err)
   // The 'config.relationships' data has been retrieved from a configuration file
-  seneca.act({role: 'entity-crud-test', cmd: 'deleterelationships', deleteresult: result, id: idFender, relationships: config.relationships}, function (err, result) {
+  seneca.act({role: 'entity-crud-test', cmd: 'deleterelationships', id: idFender, relationships: config.relationships}, function (err, result) {
     if (err) return console.error(err)
     console.log('Bye bye Fender!')
   })

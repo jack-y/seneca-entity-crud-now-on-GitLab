@@ -488,7 +488,6 @@ The pattern is:
 {
   role: 'my-role',
   cmd: 'deleterelationships',
-  deleteresult: { ... a result object ... },
   id: 'an-id',
   relationships: [ ... an array of relationships ... ]
 }
@@ -503,7 +502,7 @@ For more explanations, see this [readme][] file.
 ```js
 var myId = '5a4732ef4049cfcb07d992007e003932'
 // Delete
-act({role: 'my-role', cmd: 'deleterelationships', deleteresult: {success: true}, id: myId, relationships: myModel})
+act({role: 'my-role', cmd: 'deleterelationships', id: myId, relationships: myModel})
 .then(function (result) {
   console.log('Id ' + myId + ' relationships deleted.')
   return result

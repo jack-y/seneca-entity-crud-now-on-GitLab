@@ -260,23 +260,17 @@ module.exports = function (options) {
   /**
   * Delete relationships: deletes all relationships of an entity from its ID.
   *
-  * This action can be trigerred by the main application.
-  * The prior action is an entity deletion from its ID.
-  * The name of the delete result argument is 'deleteresult'
-  *
   * All the deletions are in asynchronous mode.
   */
   function deleteRelationships (args, done) {
-    // Checks if delete OK and relationships are set
-    if (args.deleteresult.success && args.relationships) {
+    // Checks if relationships are set
+    if (args.relationships) {
       // Loops on each relationship
       args.relationships.forEach(function (aRelationship) {
         deleteOneRelationship(args, aRelationship)
       })
-      done(null, {success: true})
     }
-    // Bad delete result or no relationship
-    done(null, {success: args.deleteresult.success})
+    done(null, {success: true})
   }
 
   /**
@@ -489,7 +483,6 @@ module.exports = function (options) {
         name: outName,
         cmd: 'deleterelationships',
         id: outId,
-        deleteresult: {success: true}, // needed for the action
         relationships: relationship.relationships
       })
     }

@@ -132,7 +132,7 @@ function runDelete () {
       act({role: role, name: 'brand', cmd: 'delete', id: idBrand})
       .then(function (result) {
         // Deletes the relationships
-        act({role: role, cmd: 'deleterelationships', deleteresult: result, id: idBrand, relationships: config.relationships})
+        act({role: role, cmd: 'deleterelationships', id: idBrand, relationships: config.relationships})
         .then(function (result) {
           return resolve({success: true})
         })

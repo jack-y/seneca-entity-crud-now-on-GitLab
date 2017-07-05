@@ -102,7 +102,6 @@ To trigger the **relational delete** action, the pattern is:
 {
   role: 'a-name',
   cmd: 'deleterelationships',
-  deleteresult: { ... a result object ... },
   id: 'an-id',
   relationships: [ ... an array of relationships ... ]
 }
@@ -110,32 +109,10 @@ To trigger the **relational delete** action, the pattern is:
 
 - **role**: the primary name of the [message][] that will be published over the network.
 - **cmd**: the fixed name of the command: *deleterelationships*
-- **deleteresult**: the result of the previous *delete* action. See below.
 - **id**: the id of the entity that own relationships to be deleted.
 - **relationships**: the list of the relationships to delete.
 
 > Note: the **id** is associated to the top *in* node entity of the first level of the relationships. 
-
-### deleteresult
-
-The **deleteresult** object is needed because of [triggers][]. When a `delete` action is performed with the `deleterelationships` action as *after* trigger, this trigger has to know if the previous `delete` finished with success.
-The **deleteresult** object must contain at least the property:
-
-```js
-success: true/false
-```
-
-If the *deleterelationships* feature is use standalone, the pattern is:
-
-```js
-{
-  role: 'a-name',
-  cmd: 'deleterelationships',
-  deleteresult: {success: true},
-  id: 'an-id',
-  relationships: [ ... an array of relationships ... ]
-}
-```
 
 ## Asynchronous deletions
 
