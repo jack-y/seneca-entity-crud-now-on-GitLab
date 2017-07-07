@@ -12,8 +12,8 @@ All that the manager will do is to say to the system: "Please, delete the entity
 
 ### The example sources
 
-The example script file is `test-relationships.js`
-The example configuration file is `config/test-relationships.js`
+The example script file is `test/deleterelationships-test.js`
+The example configuration file is `test/relationships-config.js`
 
 # The relational model
 
@@ -161,14 +161,6 @@ seneca.act({role: 'entity-crud-test', name: 'brand', cmd: 'delete', id: idFender
   })
 }))
 ```
-
-# Run the example
-
-To run this example:
-
-	node ./test-relationships.js
-
-The output shows the count of the entities and relationships before and after the deletion.
 
 # Contributing
 The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.

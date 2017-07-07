@@ -1,6 +1,6 @@
 {
   "name": "seneca-entity-crud",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "CRUD standard actions on entities",
   "keywords": [
     "node.js",
@@ -14,7 +14,9 @@
     "bluebird": "3.4.x"
   },
   "devDependencies": {
-    "seneca": "3.x",
+    "code": "4.1.x",
+    "lab": "14.1.x",
+    "seneca": "3.4.x",
     "seneca-basic": "0.5.x",
     "seneca-entity": "2.x"
   },
@@ -35,6 +37,6 @@
     "url": "https://github.com/jack-y/seneca-entity-crud"
   },
   "scripts": {
-    "test": "node ./test.js && node ./test_joins.js && node ./test-relationships.js"
+    "test": "lab -v -P test"
   }
 }

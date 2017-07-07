@@ -34,6 +34,7 @@ module.exports = function (options) {
   seneca.add({role: options.role, cmd: 'delete'}, delet)  // The 'delete' function is already defined in Javascript
 
   /* other database actions */
+  seneca.add({role: options.role, cmd: 'validate'}, validate)
   seneca.add({role: options.role, cmd: 'deleterelationships'}, deleteRelationships)
   seneca.add({role: options.role, cmd: 'truncate'}, truncate)
   seneca.add({role: options.role, cmd: 'query'}, query)
@@ -48,6 +49,21 @@ module.exports = function (options) {
   }
 
   /**
+   * Validate.
+   *
+   * The validation function is passed as argument.
+   */
+  function validate (args, done) {
+    // Checks the arguments validate function
+    var validateFunction = args.validate_function ? args.validate_function : validateDefault
+    // Validates input data
+    validateFunction(args)
+    .then(function (result) {
+      done(null, result)
+    })
+  }
+
+  /**
    * Validate and create: new entity persistence.
    *
    * Before the insert, the entity data validation is called.
@@ -55,13 +71,11 @@ module.exports = function (options) {
    * Otherwise the create command is called.
    */
   function validateAndCreate (args, done) {
-    // Checks the arguments validate function
-    var validateFunction = args.validate_function ? args.validate_function : validateDefault
-    // Validates input data
-    validateFunction(args)
-    .then(function (result) {
+    // Validates
+    validate(args, function (err, validateResult) {
+      if (err) { throw err }
       // Checks validation
-      if (result.success) {
+      if (validateResult.success) {
         // Gets the namespace
         var zone = args.zone ? args.zone : options.zone
         var base = args.base ? args.base : options.base
@@ -73,7 +87,7 @@ module.exports = function (options) {
         })
       } else {
         // Validation fail: returns errors
-        done(null, result)
+        done(null, validateResult)
       }
     })
   }
@@ -107,7 +121,8 @@ module.exports = function (options) {
         if (err) { throw err }
         // Removes the namespace
         if (args.nonamespace || args.nonamespace === 'true') {
-          delete entity.entity$
+          // Don't use delete entity.entity$ -> error
+          delete entity['entity$']
         }
         // Returns the new entity with id set
         done(null, {success: true, errors: [], entity: entity})
@@ -136,7 +151,8 @@ module.exports = function (options) {
       var success = entity !== null
       // Removes the namespace
       if (args.nonamespace || args.nonamespace === 'true') {
-        delete entity.entity$
+        // Don't use delete entity.entity$ -> error
+        delete entity['entity$']
       }
       // Adds the defaults
       if (success && defaults) {
@@ -170,13 +186,11 @@ module.exports = function (options) {
    * Otherwise the Update command is called.
    */
   function validateAndUpdate (args, done) {
-    // Checks the arguments validate function
-    var validateFunction = args.validate_function ? args.validate_function : validateDefault
-    // Validates input data
-    validateFunction(args)
-    .then(function (result) {
+    // Validates
+    validate(args, function (err, validateResult) {
+      if (err) { throw err }
       // Checks validation
-      if (result.success) {
+      if (validateResult.success) {
         // Gets the namespace
         var zone = args.zone ? args.zone : options.zone
         var base = args.base ? args.base : options.base
@@ -188,7 +202,7 @@ module.exports = function (options) {
         })
       } else {
         // Validation fail: returns errors
-        done(null, result)
+        done(null, validateResult)
       }
     })
   }
@@ -225,7 +239,8 @@ module.exports = function (options) {
           if (err) { throw err }
           // Removes the namespace
           if (args.nonamespace || args.nonamespace === 'true') {
-            delete updatedEntity.entity$
+            // Don't use delete entity.entity$ -> error
+            delete updatedEntity['entity$']
           }
           // Returns the updated entity
           return done(null, {success: true, errors: errors, entity: updatedEntity})
@@ -336,7 +351,8 @@ module.exports = function (options) {
       // Removes the namespace
       if ((args.nonamespace || args.nonamespace === 'true') && deepList.length > 0) {
         deepList.forEach(function (item) {
-          delete item.entity$
+          // Don't use delete entity.entity$ -> error
+          delete item['entity$']
         })
       }
       // Adds the defaults

@@ -120,15 +120,10 @@ All the entities and relationships deletions are done in asynchronous mode.
 
 # The full example
 
-The **test-relationships.js** script contains a full multilevels example.
-The **/config/test-relationships.js** contains an example of the relationships description.
+The `test/deleterelationships-test.js` script contains a full multilevels example.
+The `test/relationships-config.js` file contains an example of the relationships description.
 
 They are described in this [readme][] file.
-
-To run the example:
-
-	node ./test-relationships.js
-
 
 # Contributing
 The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.
@@ -140,8 +135,8 @@ Licensed under [MIT][].
 [MIT]: ../LICENSE
 [Senecajs org]: https://github.com/senecajs/
 [seneca-entity-crud]: https://github.com/jack-y/seneca-entity-crud
-[delete]: https://github.com/jack-y/seneca-entity-crud#delete
-[truncate]: https://github.com/jack-y/seneca-entity-crud#truncate
+[delete]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#delete
+[truncate]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#truncate
 [seneca mesh]: https://github.com/senecajs/seneca-mesh
 [entities]: http://senecajs.org/docs/tutorials/understanding-data-entities.html
 [triggers]: https://github.com/jack-y/seneca-triggers

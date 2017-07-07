@@ -3,7 +3,7 @@
 
 # seneca-entity-crud
 
-Last update: 07/05/2017
+Last update: 07/06/2017
 
 ### July 2017: New feature: Relational Delete
 
@@ -161,117 +161,9 @@ For **the list of the commands** and their arguments, see the chapter below: [AP
 
 # Input data validation
 
-In most cases, it's a best practice to validate input data before insert it in the database. The **seneca-entity-crud** plugin cannot validate input data by itself: it strongly depend on your application data types. However, if you need to proceed input data validation before the create or update action, the plugin can pass your prefered function with the optional `validate` and `validate_function` patterns:
+In most cases, it's a best practice to validate input data before insert it in the database. The **seneca-entity-crud** plugin cannot validate input data by itself: it strongly depend on your application data types. However, if you need to proceed input data validation, this plugin can use your prefered function.
 
-```js
-{role: role, cmd: 'create', entity: myEntity, validate: true, validate_function: myFunction}
-```
-
-### Triggers
-
-You can also use [triggers][] before or after any operation.
-
-### Rules for your validation function
-
-Your validation function must accept one parameter:
-
-- **args**: this value contains the arguments used by the create or update command. The entity is known as `args.entity`.
-
-Your validation function must return a promise with these values:
-
-- **success**: `true` or `false`
-- **errors**: an array of error objects. An example of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
-
-If there is no validation error, `success` is set to `true` and the errors array is set empty:
-
-```js
-{success: true, errors: []}
-```
-
-> Note: the errors array is pretty useful. For example, during an HTML form validation, it can return all errors in only one call. Then you can dynamically show the errors in the form, field by field.
-
-### Example
-
-Let's try it. First define your own validation function. The next example show a simple blog posts management where the post title is required:
-
-```js
-function validate_post(args) {
-  return new Promise(function (resolve, reject) {
-    var errors = []
-    if (!args.entity.title) {
-      errors.push({field: 'title', actual: null, error: 'the title is required'})
-    }
-    var success = errors.length === 0
-    resolve({success: success, errors: errors})
-  })
-}
-```
-
-Then you can try to create a new post without title. Please update the code of the previous full example:
-
-```js
-'use strict'
-
-/* Prerequisites */
-const promise = require('bluebird')
-const seneca = require('seneca')()
-
-/* Plugins declaration */
-seneca
-  .use('basic') // For Seneca >= 3.x
-  .use('entity')
-  .use('mem-store')
-  .use('seneca-entity-crud', {
-    name: 'post',
-    role: 'my-role'
-  })
-
-/* Promisify seneca actions */
-var act = promise.promisify(seneca.act, {context: seneca})
-
-/* Starts seneca */
-seneca.ready(function (err) {
-  if (err) { throw err }
-
-  /* ----- The NEW data validation function! ----- */
-  function validatePost (args) {
-    return new Promise(function (resolve, reject) {
-      var errors = []
-      if (!args.entity.title) {
-        errors.push({field: 'title', actual: null, error: 'the title is required'})
-      }
-      var success = errors.length === 0
-      resolve({success: success, errors: errors})
-    })
-  }
-
-  /* The create example without title */
-  var myPost = {content: 'Hello World'}
-  act({role: 'my-role', cmd: 'create', entity: myPost, validate: true, validate_function: validatePost})
-  .then(function (result) {
-    if (!result.success) {
-      console.log('errors: ' + JSON.stringify(result.errors))
-    } else {
-      console.log('This message will never be shown.')
-    }
-    return result
-  })
-
-  /* Ends seneca */
-  seneca.close((err) => {
-    if (err) { console.log(err) }
-  })
-})
-
-```
-
-Try it! The console shows:
-
-```js
-errors: [{"field":"title","actual":null,"error":"the title is required"}]
-```
-
-and the message `This message will never be shown.` ...will never be shown ;).
+For more information, please see the [validate action readme][] file.
 
 # The returned namespace
 
@@ -350,9 +242,9 @@ Use this command to add a new entity into your database. The pattern is:
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
-You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
+You can proceed to input data validation before the creation. See the [validate action readme][] file.
 
-`validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: [Input data validation](#input-data-validation).
+You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
 
 ### Example
 
@@ -417,9 +309,9 @@ Use this command to update an entity previously inserted into your database. The
 
 You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
 
-You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
+You can proceed to input data validation before the update. See the [validate action readme][] file.
 
-`validate` and `validate_function` are the optional arguments for input data validation. See the previous chapter: [Input data validation](#input-data-validation).
+You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
 
 The entity ID must be found in the database. If not, a `success: false` result is fired.
 
@@ -476,6 +368,29 @@ act({role: 'my-role', cmd: 'delete', id: myId})
 ### Result object
 
 - **success**: `true`.
+
+## validate
+
+Use this command to validate your data. The pattern is:
+
+```js
+{role: role, cmd: 'validate', entity: myEntity, validate_function: myFunction}
+```
+
+### Explanations and example
+
+See the [validate action readme][] file.
+
+### Result object
+
+- **success**: `true` or `false`
+- **errors**: an array of error objects. An example of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
+
+If there is no validation error, `success` is set to `true` and the errors array is set empty:
+
+```js
+{success: true, errors: []}
+```
 
 ## deleterelationships
 
@@ -549,6 +464,7 @@ In the application, if the `truncate` action is intended to publish the generate
 ```js
 act({role: 'my-role', cmd: 'query'})
 .then(function(result) {
+  var cmds = []
   result.list.forEach(function(item) {
     var command = act({role: 'my-role', cmd: 'delete', id: item.id})
     cmds.push(command)    
@@ -678,14 +594,14 @@ npm install seneca-entity-crud
 To run tests, simply use npm:
 
 ```sh
-npm run test
+npm test
 ```
 
 # Contributing
 The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.
 
 ## License
-Copyright (c) 2016, Richard Rodger and other contributors.<br/>
+Copyright (c) 2016-2017, Richard Rodger and other contributors.
 Licensed under [MIT][].
 
 [MIT]: ./LICENSE
@@ -701,6 +617,7 @@ Licensed under [MIT][].
 [shortid]: https://cnpmjs.org/package/shortid
 [Query syntax]: http://senecajs.org/docs/tutorials/understanding-query-syntax.html
 [seneca mesh]: https://github.com/senecajs/seneca-mesh
-[joins]: https://github.com/jack-y/seneca-entity-crud/blob/master/joins/README.md
+[joins]: https://github.com/jack-y/seneca-entity-crud/blob/master/README-JOINS.md
 [readme]: https://github.com/jack-y/seneca-entity-crud/blob/master/relationships/README.md
 [triggers]: https://github.com/jack-y/seneca-triggers
+[validate action readme]: https://github.com/jack-y/seneca-entity-crud/blob/master/README-VALIDATE.md

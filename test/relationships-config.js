@@ -119,13 +119,13 @@ config.entitiesrelationships = [
 ]
 
 config.results = [
-  {name: 'brand', count: '1'},
-  {name: 'type', count: '1'},
-  {name: 'product', count: '1'},
-  {name: 'supplier', count: '2'},
-  {name: 'brand_type', count: '1'},
-  {name: 'type_product', count: '1'},
-  {name: 'brand_supplier', count: '1'}
+  {name: 'brand', count: 1},
+  {name: 'type', count: 1},
+  {name: 'product', count: 1},
+  {name: 'supplier', count: 2},
+  {name: 'brand_type', count: 1},
+  {name: 'type_product', count: 1},
+  {name: 'brand_supplier', count: 1}
 ]
 
 // Exports configuration

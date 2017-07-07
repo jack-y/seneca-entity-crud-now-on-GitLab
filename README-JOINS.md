@@ -263,13 +263,13 @@ If you find solutions for more complex situations, I will be happy to share them
 The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.
 
 ## License
-Copyright (c) 2017, Richard Rodger and other contributors.<br/>
+Copyright (c) 2017, Richard Rodger and other contributors.
 Licensed under [MIT][].
 
 [MIT]: ../LICENSE
 [Senecajs org]: https://github.com/senecajs/
 [seneca-entity-crud]: https://github.com/jack-y/seneca-entity-crud
 [README file]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#the-returned-namespace
-[read]: https://github.com/jack-y/seneca-entity-crud#read
-[query]: https://github.com/jack-y/seneca-entity-crud#query
+[read]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#read
+[query]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#query
 [this post]: http://microservices.io/patterns/data/database-per-service.html
