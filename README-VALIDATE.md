@@ -1,6 +1,6 @@
 # Input data validation
 
-Last update: 07/06/2017
+Last update: 07/07/2017
 
 In most cases, it's a best practice to validate input data before insert it in the database. The **seneca-entity-crud** plugin cannot validate input data by itself: it strongly depend on your application data types. However, if you need to proceed input data validation, this plugin can use your prefered function.
 
@@ -29,7 +29,7 @@ The plugin can also proceed input data validation before the `create` or `update
 {role: role, cmd: 'create', entity: myEntity, validate: true, validate_function: myFunction}
 ```
 
-See below an [example with *create* and *update* actions](#validate-with-*create*-and-*update*-actions).
+See below an [example with *create* and *update* actions](#validate-with-create-and-update-actions).
 
 ### Rules for your validation function
 

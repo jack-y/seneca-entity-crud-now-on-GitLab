@@ -3,7 +3,9 @@
 
 # seneca-entity-crud
 
-Last update: 07/06/2017
+Last update: 07/07/2017
+
+<a href="https://badge.fury.io/js/seneca-entity-crud"><img src="https://badge.fury.io/js/seneca-entity-crud.svg" alt="npm version" height="20"></a>&nbsp;<a href="https://www.npmjs.com/package/seneca-entity-crud"><img src="https://img.shields.io/npm/dm/seneca-entity-crud.svg?maxAge=2592000" alt="Downloads count"></a>&nbsp;<a href="https://travis-ci.org/jack-y/seneca-entity-crud"><img src="https://travis-ci.org/jack-y/seneca-entity-crud.svg?branch=master" alt="build status" data-canonical-src="https://travis-ci.org/jack-y/seneca-entity-crud.svg" height="20"></a>&nbsp;<a href='https://coveralls.io/github/jack-y/seneca-entity-crud?branch=master'><img src='https://coveralls.io/repos/github/jack-y/seneca-entity-crud/badge.svg?branch=master' alt='Coverage Status' /></a>
 
 ### July 2017: New feature: Relational Delete
 
@@ -591,6 +593,7 @@ npm install seneca-entity-crud
 ```
 
 # Test
+
 To run tests, simply use npm:
 
 ```sh
