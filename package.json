@@ -29,7 +29,7 @@
   "author": "Jacques Desodt <jdesodt@e-soa.com>",
   "contributors": [],
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=5.0.0"
   },
   "main": "entity-crud.js",
   "repository": {
