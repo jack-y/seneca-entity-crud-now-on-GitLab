@@ -11,10 +11,11 @@
     "relationship"
   ],
   "dependencies": {
-    "bluebird": "3.4.x"
+    "bluebird": "3.5.x"
   },
   "devDependencies": {
     "code": "4.1.x",
+    "coveralls": "^2.13.1",
     "lab": "14.1.x",
     "seneca": "3.4.x",
     "seneca-basic": "0.5.x",
