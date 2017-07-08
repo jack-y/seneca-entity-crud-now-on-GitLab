@@ -34,7 +34,7 @@ describe('deleterelationships', function () {
         runDelete(seneca)
         .then(function (result) {
           /* Checks the results */
-          checkResults(seneca)
+          checkResults(seneca, result)
           .then(function (result) {
             fin()
           })
@@ -63,7 +63,8 @@ function createBasicEntities (seneca) {
 /* Creates a single entity */
 function createOneEntity (seneca, item) {
   return new Promise(function (resolve, reject) {
-    seneca.act({role: role, name: item.name, cmd: 'create', entity: item.entity}, function (ignore, result) {
+    seneca.act({role: role, name: item.name, cmd: 'create', entity: item.entity},
+    function (ignore, result) {
       return resolve(result)
     })
   })
@@ -89,10 +90,12 @@ function createRelationships (seneca) {
 function createOneRelationship (seneca, relationship) {
   return new Promise(function (resolve, reject) {
     // Reads in
-    seneca.act({role: role, name: relationship.in.name, cmd: 'query', select: {'name': relationship.in.data}}, function (ignore, result) {
+    seneca.act({role: role, name: relationship.in.name, cmd: 'query', select: {'name': relationship.in.data}},
+    function (ignore, result) {
       var inId = result.list[0].id
       // Reads out
-      seneca.act({role: role, name: relationship.out.name, cmd: 'query', select: {'name': relationship.out.data}}, function (ignore, result) {
+      seneca.act({role: role, name: relationship.out.name, cmd: 'query', select: {'name': relationship.out.data}},
+      function (ignore, result) {
         var outId = result.list[0].id
         // Creates relationship
         var entity = {}
@@ -111,12 +114,15 @@ function createOneRelationship (seneca, relationship) {
 function runDelete (seneca) {
   return new Promise(function (resolve, reject) {
     // Reads the brand to delete
-    seneca.act({role: role, name: 'brand', cmd: 'query', select: {'name': config.deletebrandname}}, function (ignore, result) {
+    seneca.act({role: role, name: 'brand', cmd: 'query', select: {'name': config.deletebrandname}},
+    function (ignore, result) {
       // Deletes the brand
       var idBrand = result.list[0].id
-      seneca.act({role: role, name: 'brand', cmd: 'delete', id: idBrand}, function (ignore, result) {
-        // Deletes the relationships
-        seneca.act({role: role, cmd: 'deleterelationships', id: idBrand, relationships: config.relationships}, function (ignore, result) {
+      seneca.act({role: role, name: 'brand', cmd: 'delete', id: idBrand},
+      function (ignore, deleteResult) {
+      // Deletes the relationships
+        seneca.act({role: role, cmd: 'deleterelationships', id: idBrand, relationships: config.relationships},
+        function (ignore, result) {
           return resolve(result)
         })
       })
@@ -126,11 +132,19 @@ function runDelete (seneca) {
 
 /* Checks if the entity and its relationships are deleted */
 /* The configuration file contains the name of the entity to be deleted */
-function checkResults (seneca) {
+function checkResults (seneca, result) {
   return new Promise(function (resolve, reject) {
+    // Checks action result
+    expect(result.success).to.equal(true)
+    expect(result.results.length).to.equal(2)
+    expect(result.results[0].success).to.equal(true)
+    expect(result.results[1].success).to.equal(true)
+    expect(result.results[1].name).to.equal('brand_supplier')
+    expect(result.results[1].count).to.equal(2)
     setTimeout(function () {
-      // Checks deleted brand
-      seneca.act({role: role, name: 'brand', cmd: 'query', select: {'name': config.deletebrandname}}, function (ignore, result) {
+    // Checks deleted brand
+      seneca.act({role: role, name: 'brand', cmd: 'query', select: {'name': config.deletebrandname}},
+      function (ignore, result) {
         expect(result.success).to.equal(true)
         expect(result.count).to.equal(0)
         // Loops on results
@@ -151,7 +165,8 @@ function checkResults (seneca) {
 function chekOneResult (seneca, expected) {
   return new Promise(function (resolve, reject) {
     // Checks
-    seneca.act({role: role, name: expected.name, cmd: 'query'}, function (ignore, result) {
+    seneca.act({role: role, name: expected.name, cmd: 'query'},
+    function (ignore, result) {
       expect(result.success).to.equal(true)
       expect(result.count).to.equal(expected.count)
       return resolve({success: true})

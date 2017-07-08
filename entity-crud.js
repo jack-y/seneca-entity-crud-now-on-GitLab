@@ -281,11 +281,20 @@ module.exports = function (options) {
     // Checks if relationships are set
     if (args.relationships) {
       // Loops on each relationship
+      var cmds = []
       args.relationships.forEach(function (aRelationship) {
-        deleteOneRelationship(args, aRelationship)
+        var command = deleteOneRelationship(args, aRelationship)
+        cmds.push(command)
       })
+      // Fires all actions
+      promise.all(cmds)
+      .then(function (results) {
+        return done(null, {success: true, results: results})
+      })
+    } else {
+      // No relationships
+      return done(null, {success: true, results: []})
     }
-    done(null, {success: true})
   }
 
   /**
@@ -447,24 +456,38 @@ module.exports = function (options) {
   * The master may be already deleted
   **/
   function deleteOneRelationship (args, relationship) {
+    return new Promise(function (resolve, reject) {
     // Gets the namespace
-    var zone = relationship.location.zone ? relationship.location.zone : options.zone
-    var base = relationship.location.base ? relationship.location.base : options.base
-    var name = relationship.location.name ? relationship.location.name : options.name
-    // Sets the query select to find relational entities
-    var select = {}
-    select[relationship.in_idname] = args.id
-    // Finds the relational entities
-    act({role: relationship.location.role, zone: zone, base: base, name: name, cmd: 'query', select})
-    .then(function (result) {
-      // Checks if query OK
-      if (result.success) {
-        // Loops on each relationship data
-        result.list.forEach(function (item) {
-          // Deletes one relationship data in asynchronous mode
-          deleteOneRelationshipData(item, relationship)
-        })
-      }
+      var zone = relationship.location.zone ? relationship.location.zone : options.zone
+      var base = relationship.location.base ? relationship.location.base : options.base
+      var name = relationship.location.name ? relationship.location.name : options.name
+      // Sets the query select to find relational entities
+      var select = {}
+      select[relationship.in_idname] = args.id
+      // Finds the relational entities
+      act({role: relationship.location.role, zone: zone, base: base, name: name, cmd: 'query', select})
+      .then(function (result) {
+        var queryResult = {success: result.success, role: relationship.location.role, zone: zone, base: base, name: name, count: result.count}
+        // Checks if query OK
+        if (result.success) {
+          // Loops on each relationship data
+          var cmds = []
+          result.list.forEach(function (item) {
+            // Deletes one relationship data in asynchronous mode
+            var command = deleteOneRelationshipData(item, relationship)
+            cmds.push(command)
+          })
+          promise.all(cmds)
+          .then(function (results) {
+            // Returns the query result before delete
+            return resolve(queryResult)
+          })
+        } else {
+          // The query returns bad result
+          // Returns the query result before delete
+          return resolve(queryResult)
+        }
+      })
     })
   }
 
@@ -472,36 +495,39 @@ module.exports = function (options) {
   * Deletes one relationship data in asynchronous mode
   **/
   function deleteOneRelationshipData (item, relationship) {
-    // Gets the namespace
-    var zone = relationship.location.zone ? relationship.location.zone : options.zone
-    var base = relationship.location.base ? relationship.location.base : options.base
-    var name = relationship.location.name ? relationship.location.name : options.name
-    // Deletes the relationship data in asynchronous mode
-    seneca.act({role: relationship.location.role, zone: zone, base: base, name: name, cmd: 'delete', id: item.id})
-    // Gets the slave entity ID
-    var outId = item[relationship.out.idname]
-    // Gets the out namespace
-    var outZone = relationship.out.location.zone ? relationship.out.location.zone : options.zone
-    var outBase = relationship.out.location.base ? relationship.out.location.base : options.base
-    var outName = relationship.out.location.name ? relationship.out.location.name : options.name
-    // Checks if relationship slave must also be deleted
-    if (relationship.out.delete) {
-    // Asynchronous slave delete: no return
-      seneca.act({role: relationship.out.location.role, zone: outZone, base: outBase, name: outName, cmd: 'delete', id: outId})
-    }
-    // RECURSION: Checks if a subrelationship exists
-    if (relationship.relationships) {
-      // Fires the subrelationship deletion in asynchronous mode
-      seneca.act({
-        role: relationship.out.location.role,
-        zone: outZone,
-        base: outBase,
-        name: outName,
-        cmd: 'deleterelationships',
-        id: outId,
-        relationships: relationship.relationships
-      })
-    }
+    return new Promise(function (resolve, reject) {
+      // Gets the namespace
+      var zone = relationship.location.zone ? relationship.location.zone : options.zone
+      var base = relationship.location.base ? relationship.location.base : options.base
+      var name = relationship.location.name ? relationship.location.name : options.name
+      // Deletes the relationship data in asynchronous mode
+      seneca.act({role: relationship.location.role, zone: zone, base: base, name: name, cmd: 'delete', id: item.id})
+      // Gets the slave entity ID
+      var outId = item[relationship.out.idname]
+      // Gets the out namespace
+      var outZone = relationship.out.location.zone ? relationship.out.location.zone : options.zone
+      var outBase = relationship.out.location.base ? relationship.out.location.base : options.base
+      var outName = relationship.out.location.name ? relationship.out.location.name : options.name
+      // Checks if relationship slave must also be deleted
+      if (relationship.out.delete) {
+      // Asynchronous slave delete: no return
+        seneca.act({role: relationship.out.location.role, zone: outZone, base: outBase, name: outName, cmd: 'delete', id: outId})
+      }
+      // RECURSION: Checks if a subrelationship exists
+      if (relationship.relationships) {
+        // Fires the subrelationship deletion in asynchronous mode
+        seneca.act({
+          role: relationship.out.location.role,
+          zone: outZone,
+          base: outBase,
+          name: outName,
+          cmd: 'deleterelationships',
+          id: outId,
+          relationships: relationship.relationships
+        })
+      }
+      return resolve({success: true})
+    })
   }
 
   /* --------------- JOINS --------------- */

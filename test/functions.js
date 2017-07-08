@@ -2,10 +2,11 @@
 'use strict'
 const promise = require('bluebird')
 
-exports.timeout = 5000
-
 exports.setSeneca = function (Seneca, role, fin, print) {
-  return Seneca({ log: 'test' })
+  return Seneca({
+    log: 'test',
+    timeout: 5000
+  })
     // Activates unit test mode. Errors provide additional stack tracing context.
     // The fin callback is called when an error occurs anywhere.
     .test(fin, print)
