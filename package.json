@@ -38,7 +38,8 @@
     "url": "https://github.com/jack-y/seneca-entity-crud"
   },
   "scripts": {
-    "test": "lab -v -P test",
-    "coveralls": "lab -s -P test -r lcov | coveralls"
+    "test": "lab -v -P test -m 5000",
+    "coveralls": "lab -s -P test -m 5000 -r lcov | coveralls",
+    "coverage": "lab -v -P test -m 5000 -r html > coverage.html"
   }
 }
