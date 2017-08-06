@@ -1,18 +1,15 @@
-![Logo]
+![Logo][]
+
 > A [seneca.js][] entity CRUD plugin.
 
 # seneca-entity-crud
 
-Last update: 07/08/2017
+Last update: 08/06/2017
 
-<a href="https://badge.fury.io/js/seneca-entity-crud"><img src="https://badge.fury.io/js/seneca-entity-crud.svg" alt="npm version" height="20"></a>&nbsp;<a href="https://www.npmjs.com/package/seneca-entity-crud"><img src="https://img.shields.io/npm/dm/seneca-entity-crud.svg?maxAge=2592000" alt="Downloads count"></a>&nbsp;<a href="https://travis-ci.org/jack-y/seneca-entity-crud"><img src="https://travis-ci.org/jack-y/seneca-entity-crud.svg?branch=master" alt="build status" data-canonical-src="https://travis-ci.org/jack-y/seneca-entity-crud.svg" height="20"></a>&nbsp;<a href="https://david-dm.org/jack-y/seneca-entity-crud"><img src="https://david-dm.org/jack-y/seneca-entity-crud.svg" alt="Dependency Status" data-canonical-src="https://david-dm.org/jack-y/seneca-entity-crud.svg" height="20"></a>&nbsp;<a href='https://coveralls.io/github/jack-y/seneca-entity-crud?branch=master'><img src='https://coveralls.io/repos/github/jack-y/seneca-entity-crud/badge.svg?branch=master' alt='Coverage Status' /></a>
-
-### July 2017: New feature: Relational Delete
-
-The **Relational Delete** feature provides deletion of a set of relational entities from a given entity.
-See this [readme][] file.
-
-## Description
+[![npm version][npm-badge]][npm-url]
+[![Build Status][travis-badge]][travis-url]
+[![Dependency Status][david-badge]][david-url]
+[![Coveralls][BadgeCoveralls]][Coveralls]
 
 This module is a plugin for the [Seneca][] framework. It provides basic [CRUD][] persistent actions for entities, and some extras.
 
@@ -620,6 +617,14 @@ Licensed under [MIT][].
 
 [MIT]: ./LICENSE
 [Logo]: http://senecajs.org/files/assets/seneca-logo.jpg
+[npm-badge]: https://badge.fury.io/js/seneca-entity-crud.svg
+[npm-url]: https://npmjs.com/package/seneca-entity-crud
+[travis-badge]: https://travis-ci.org/jack-y/seneca-entity-crud.svg
+[travis-url]: https://travis-ci.org/jack-y/seneca-entity-crud
+[david-badge]: https://david-dm.org/jack-y/seneca-entity-crud.svg
+[david-url]: https://david-dm.org/jack-y/seneca-entity-crud
+[Coveralls]: https://coveralls.io/github/jack-y/seneca-entity-crud?branch=master
+[BadgeCoveralls]: https://coveralls.io/repos/github/jack-y/seneca-entity-crud/badge.svg?branch=master
 [Seneca.js]: https://www.npmjs.com/package/seneca
 [Seneca]: http://senecajs.org/
 [Senecajs org]: https://github.com/senecajs/
