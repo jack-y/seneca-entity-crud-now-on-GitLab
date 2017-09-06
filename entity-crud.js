@@ -39,6 +39,7 @@ module.exports = function (options) {
   seneca.add({role: options.role, cmd: 'truncate'}, truncate)
   seneca.add({role: options.role, cmd: 'query'}, query)
   seneca.add({role: options.role, cmd: 'count'}, count)
+  seneca.add({role: options.role, cmd: 'check'}, check)
 
   /* --------------- FUNCTIONS --------------- */
 
@@ -421,6 +422,47 @@ module.exports = function (options) {
       }
       // Returns the list
       done(null, {success: true, count: deepList.length})
+    })
+  }
+
+  /**
+  * Check: to verify that the store is OK.
+  * It is done by a create + delete operation.
+  */
+  function check (args, done) {
+    // Initializes
+    var entity = args.entity ? args.entity : {check: 'check'}
+    // Gets the namespace
+    var zone = args.zone ? args.zone : options.zone
+    var base = args.base ? args.base : options.base
+    var name = args.name ? args.name : options.name
+    // Creates the entity
+    act({role: options.role, zone: zone, base: base, name: name, cmd: 'create', entity: entity})
+    .then(function (result) {
+      // Checks if create is successful
+      if (result.success) {
+        // Deletes the entity
+        act({role: options.role, zone: zone, base: base, name: name, cmd: 'delete', id: result.entity.id})
+        .then(function (result) {
+          // Checks if delete is successful
+          if (result.success) {
+            done(null, {success: true})
+          } else {
+            // Delete on error
+            done(null, {success: false, errors: result.errors, command: 'delete'})
+          }
+        })
+        .catch(function (err) {
+          done(null, {success: false, errors: [err], command: 'delete'})
+        })
+      } else {
+        // Create on error
+        done(null, {success: false, errors: result.errors, command: 'create'})
+      }
+    })
+    .catch(function (err) {
+      console.log('catch create')
+      done(null, {success: false, errors: [err], command: 'create'})
     })
   }
 

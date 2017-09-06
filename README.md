@@ -4,7 +4,7 @@
 
 # seneca-entity-crud
 
-Last update: 08/06/2017
+Last update: 09/06/2017
 
 [![npm version][npm-badge]][npm-url]
 [![Build Status][travis-badge]][travis-url]
@@ -18,7 +18,7 @@ The [seneca-entity][] plugin already provides simple persistent functions: `save
 ## Why this plugin?
 
 When we develop real applications, we often have to manage a lot of entities. For example: customer, product, catalog, address, order, sell, relations between them and so one.
-Working with the [seneca-entity][] plugin, the same kind of code can be duplicated a lot of time. For example, this a code used to simply read an entity:
+Working with the [seneca-entity][] plugin, the same kind of code can be duplicated a lot of time. For example, here is a code used to simply read an entity:
 
 ```js
 // Database entity creation
@@ -28,10 +28,9 @@ entityFactory.load$(anId, (err, result) => {
   if ( err ) { throw err }
   // ... do some stuff with result ...
 })
-
 ```
 
-The **seneca-entity-crud** plugin do the same work in a simplest manner. It define a `read` command and can use the [promises][] power. Let's see it.
+The **seneca-entity-crud** plugin do the same work in a simplest manner. It defines a `read` command and can use the [promises][] power. Let's see it.
 
 Once for all, the application promisify the `act` function:
 
@@ -59,6 +58,7 @@ One very nice thing: in addition to CRUD, this plugin offers additional commands
 - The `query` command encapsulate the `list$` function.
 - The `count` command encapsulate the `list$` function, but return only the count for network optimization.
 - The `deleterelationships` command extends the deletion of an entity to that of all its relations. See this [readme][] file.
+- The `check` command verify that the store works. It performs a create-then-delete operation. This is useful when the microservice using this plugin has a *health* process.
 
 And we even lie on the floor:
 
@@ -68,7 +68,7 @@ And we even lie on the floor:
 - For security, using the optional `nonamespace: true` argument, the namespace of the resulting entities is automatically removed.
 - Defaults can be added to the resulting entities.
 
-Enjoy!
+Enjoy it!
 
 # How it works
 
@@ -97,11 +97,11 @@ seneca.use('seneca-entity-crud', {
 
 The **options** are:
 
-- `zone`: the name of your zone (optional).
-- `base`: the name of your base (optional).
-- `name`: the primary name of your entities. Default: `entity`. The primary name must not contain hyphen (-).
-- `last_update`: an optional boolean value. If true, the current date value is automatically added to each entity (*the field name is* `last_update`) when created or updated. Default: `false`.
-- `role`: the name of your role, so this plugin commands are part of your patterns.  Default: `entity`.
+- **zone**: the name of your zone (optional).
+- **base**: the name of your base (optional).
+- **name**: the primary name of your entities. Default: `entity`. The primary name must not contain hyphen (-).
+- **last_update**: an optional boolean value. If true, the current date value is automatically added to each entity (*the field name is* `last_update`) when created or updated. Default: `false`.
+- **role**: the name of your role, so this plugin commands are part of your patterns.  Default: `entity`.
 
 For more information on zone, base and name, see the [entity namespace][] tutorial.
 For more information on role, see the [seneca patterns][] guide.
@@ -259,8 +259,8 @@ act({role: 'my-role', cmd: 'create', entity: myEntity)
 
 ### Result object
 
-- **success**: `true` or `false`. `false` is returned if the input data validation is used and fail.
-- **errors**: an array. If the input data validation is used and fail, `errors` is the array of error objects. An exemple of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
+- **success**: `true` or `false`. `false` is returned if the input data validation is used and fails.
+- **errors**: an array. If the input data validation is used and fails, `errors` is the array of error objects. An exemple of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
 - **entity**: if there is no input data validation or if it has succeeded, this value is the input entity updated with its `id` field set. If the `last_update` plugin option is set to `true`, this value has its `last_update` field set with the current date.
 
 > Note: the ID generated for the entity is provided by the store plugin used in your application.
@@ -591,6 +591,44 @@ act({role: 'my-role', cmd: 'count', select: mySelect, deepselect: myDeepSelect})
 
 - **success**: `true`.
 - **count**: the number of entities, according to the filters. If no entity match the filters, the `0` value is returned.
+
+## check
+
+Use this command to verify that the store can create-then-delete an entity. The pattern is:
+
+```js
+{role: 'my-role', cmd: 'check'}
+```
+
+You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
+
+The default entity object used to be created then deleted is:
+
+```js
+{check: 'check'}
+```
+
+You can pass an `entity` argument to override this default object. 
+
+### Example
+
+```js
+// Check
+act({role: 'my-role', cmd: 'check'})
+.then(function(result) {
+  if (!result.success) {
+    // ... do some stuff with the error ...
+    console.log('Oops, check returns an error.')
+  }
+  return result
+})
+```
+
+### Result object
+
+- **success**: `true` or `false`. `true` if the create-then-delete operation is successful, `false` otherwise.
+- **errors**: an array. It contains the error objects returned by the create-then-delete operation when it fails.
+- **command**: `create` or `delete`. The name of the command which fires the error when the create-then-delete operation fails.
 
 # Install
 
