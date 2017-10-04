@@ -44,7 +44,6 @@ describe('joins', function () {
       })
     })
   })
-
   // Simple with no namespace
   it('no namespace', function (fin) {
     // Initializes
@@ -73,7 +72,6 @@ describe('joins', function () {
       })
     })
   })
-
   // Multiple
   it('multiple', function (fin) {
     // Gets the Seneca instance
@@ -101,7 +99,6 @@ describe('joins', function () {
       })
     })
   })
-
   // Multiple with no namespace
   it('multiple no namespace', function (fin) {
     // Gets the Seneca instance
@@ -130,6 +127,33 @@ describe('joins', function () {
         expect(result.entity.brand.entity$).to.exist()
         expect(result.entity.supplier.entity$).to.exist()
         expect(result.entity.supplier.city.entity$).to.not.exist()
+        fin()
+      })
+    })
+  })
+  // Query with joins first and then deep select
+  it('query with joins first', function (fin) {
+    // Initializes
+    var zipcode = '59491'
+    var productName = 'bar'
+    // Gets the Seneca instance
+    var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
+    testFunctions.createJoinsFirstEntities(seneca, role, zipcode, productName)
+    .then(function (createResult) {
+      // Query with joins first
+      seneca.act({
+        role: role,
+        name: 'product',
+        cmd: 'query',
+        joinfirst: true,
+        joins: [{ role: role, name: 'supplier', idname: 'id_supplier', resultname: 'supplier' }],
+        deepselect: [{ property: 'supplier.zipcode', value: zipcode }]
+      },
+      function (ignore, result) {
+        expect(result.success).to.equal(true)
+        expect(result.list.length).to.equal(1)
+        expect(result.list[0].supplier.zipcode).to.equal(zipcode)
+        expect(result.list[0].name).to.equal(productName)
         fin()
       })
     })

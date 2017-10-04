@@ -345,48 +345,37 @@ module.exports = function (options) {
     // Gets the query options
     var select = args.select ? args.select : {}
     var deepSelect = args.deepselect ? args.deepselect : []
+    var joinsList = args.joins ? args.joins : []
+    var nonamespace = args.nonamespace || args.nonamespace === 'true'
     // Gets the list from the database
     entityFactory.list$(select, (err, list) => {
       if (err) { throw err }
-      var deepList = list
-      var listCount = list.length
-      var deepSelectCount = deepSelect.length
-      // Process the list
-      if (deepSelectCount > 0 && listCount > 0) {
-        // Loops on each deep select
-        deepSelect.forEach(function (item) {
-          deepList = selectDeep(deepList, item)
-        })
-      }
-      // Removes the namespace
-      if ((args.nonamespace || args.nonamespace === 'true') && deepList.length > 0) {
-        deepList.forEach(function (item) {
-          // Don't use delete entity.entity$ -> error
-          delete item['entity$']
-        })
-      }
-      // Adds the defaults
-      if (defaults) {
-        for (let defaultName in defaults) {
-          deepList.forEach(function (item) {
-            if (!item[defaultName]) {
-              item[defaultName] = defaults[defaultName]
-            }
-          })
-        }
-      }
-      // Checks if joins are requested
-      var joinsList = args.joins ? args.joins : null
-      if (deepList.length > 0 && joinsList) {
-        // Perform the joins reading
-        readJoinsForList(deepList, joinsList)
+      // Checks if joins are to be performed first
+      if (args.joinfirst && list.length > 0 && joinsList.length > 0) {
+        // Performs first the joins
+        readJoinsForList(list, joinsList)
         .then(function (result) {
-          // Returns the read entity with joins
-          return done(null, {success: true, list: result.list, count: result.list.length})
+          // Formats: deep select, nonamespace and defaults
+          var formattedList = formatList(result.list, deepSelect, nonamespace, defaults)
+          // Returns the query result with joins
+          return done(null, {success: true, list: formattedList, count: formattedList.length})
         })
       } else {
-        // Returns the list
-        done(null, {success: true, list: deepList, count: deepList.length})
+        // No joins first
+        // Formats: deep select, nonamespace and defaults
+        var formattedList = formatList(list, deepSelect, nonamespace, defaults)
+        // Checks if joins are to be performed
+        if (formattedList.length > 0 && joinsList.length > 0) {
+          // Performs the joins
+          readJoinsForList(formattedList, joinsList)
+          .then(function (result) {
+            // Returns the query result with joins
+            return done(null, {success: true, list: result.list, count: result.list.length})
+          })
+        } else {
+          // Returns the query result
+          done(null, {success: true, list: formattedList, count: formattedList.length})
+        }
       }
     })
   }
@@ -464,6 +453,39 @@ module.exports = function (options) {
       console.log('catch create')
       done(null, {success: false, errors: [err], command: 'create'})
     })
+  }
+
+  /* --------------- QUERY --------------- */
+
+  /* Formats the list: deep select, nonamespace and defaults */
+  function formatList (list, deepSelect, nonamespace, defaults) {
+    // Initializes
+    var deepList = list
+    // Process the deep selects
+    if (deepSelect.length > 0 && list.length > 0) {
+      // Loops on each deep select
+      deepSelect.forEach(function (item) {
+        deepList = selectDeep(deepList, item)
+      })
+    }
+    // Removes the namespace
+    if (nonamespace && deepList.length > 0) {
+      deepList.forEach(function (item) {
+        // Don't use delete entity.entity$ -> error
+        delete item['entity$']
+      })
+    }
+    // Adds the defaults
+    if (defaults && deepList.length > 0) {
+      for (let defaultName in defaults) {
+        deepList.forEach(function (item) {
+          if (!item[defaultName]) {
+            item[defaultName] = defaults[defaultName]
+          }
+        })
+      }
+    }
+    return deepList
   }
 
   /* Selects on a deep query */

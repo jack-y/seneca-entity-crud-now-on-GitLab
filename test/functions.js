@@ -132,3 +132,31 @@ exports.createJoinsEntities = function (seneca, role) {
     })
   })
 }
+
+exports.createJoinsFirstEntities = function (seneca, role, zipcode, productName) {
+  return new Promise(function (resolve, reject) {
+    // Entities
+    var supplier1 = { name: 'John Doo', zipcode: '94107' }
+    var supplier2 = { name: 'Paul Hisson', zipcode: zipcode }
+    var product1 = { name: 'foo' }
+    var product2 = { name: productName }
+    // Creates suppliers
+    seneca.act({role: role, name: 'supplier', cmd: 'create', entity: supplier1}, function (ignore, resultA) {
+      supplier1 = resultA.entity
+      seneca.act({role: role, name: 'supplier', cmd: 'create', entity: supplier2}, function (ignore, resultB) {
+        supplier2 = resultB.entity
+        // Memorizes suppliers IDs
+        product1.id_supplier = supplier1.id
+        product2.id_supplier = supplier2.id // joins productName with zipcode
+        // Creates products
+        seneca.act({role: role, name: 'product', cmd: 'create', entity: product1}, function (ignore, resultC) {
+          product1 = resultC.entity
+          seneca.act({role: role, name: 'product', cmd: 'create', entity: product2}, function (ignore, resultD) {
+            product2 = resultD.entity
+            return resolve({ success: true })
+          })
+        })
+      })
+    })
+  })
+}

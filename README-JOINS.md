@@ -1,6 +1,6 @@
 # joins feature
 
-Last update: 05/08/2017
+Last update: 10/04/2017
 
 ## Description
 
@@ -94,7 +94,6 @@ act({role: 'delivery', cmd: 'read', id: anId, joins: [
 .then(function(result) {
   // ... do some stuff with result ...
 })
-
 ```
 
 Ooooh yeah. Less code. More comprehensive.
@@ -236,7 +235,7 @@ By example, with this join:
 ```js
 {role: 'product', idname: 'id_product', resultname: 'delivery_product' }
 ```
- 
+
 the end delivery entity become:
 
 ```js
@@ -253,6 +252,55 @@ the end delivery entity become:
 ```
 
 - If the `resultname` value is unset, the **role** name is used. See the [previous chapter](#the-role).
+
+## Query with joins first, then deep select
+
+For performance reasons, when executing a [query][], the **joins** function is performed after the [deep select][] function. But sometimes, you first have to do the joins, then perform deep select on the resulting join values. This can be done using the **joinfirst** argument set to `true`.
+
+### The pattern
+
+To perform joins first, the **query** pattern is:
+
+```js
+{ role: 'myRole', cmd: 'query', joinfirst: true, joins: myJoins, deepselect: myDeepSelect }
+```
+
+> Note: this could lead to a lack of performance
+
+### Example
+
+Let's go with some  `product` and `supplier` entities:
+
+```javascript
+products = [
+  { id: 'p1', name: 'foo', id_supplier: 's1' },
+  { id: 'p2', name: 'bar', id_supplier: 's2' }
+]
+suppliers = [
+  { id: 's1', name: 'John Doo', zipcode: '94107' },
+  { id: 's2', name: 'Jobi Joba', zipcode: '59491' }
+]
+```
+
+Then, the query command:
+
+```javascript
+var myJoins = [{ role: 'myrole', name: 'supplier', idname: 'id_supplier', resultname: 'supplier' }]
+var myDeepSelect = [{ property: 'supplier.zipcode', value: '59491' }]
+act({
+  role: 'myrole',
+  name: 'product',
+  cmd: 'query',
+  joinfirst: true,
+  joins: myJoins,
+  deepSelect: myDeepSelect
+})
+.then(function (result) {
+  console.log('result list', result.list)	// [ product p2 ]
+})
+```
+
+If the **joinfirst** argument is not set to `true`, this query's result is an empty list.
 
 # ... and what about multiple relations?
 
@@ -273,3 +321,4 @@ Licensed under [MIT][].
 [read]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#read
 [query]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#query
 [this post]: http://microservices.io/patterns/data/database-per-service.html
+[deep select]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#deep-select
