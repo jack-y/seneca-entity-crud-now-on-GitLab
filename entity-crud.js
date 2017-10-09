@@ -429,7 +429,7 @@ module.exports = function (options) {
     act({role: options.role, zone: zone, base: base, name: name, cmd: 'create', entity: entity})
     .then(function (result) {
       // Checks if create is successful
-      if (result.success) {
+      if (result.success && result.entity && result.entity.id) {
         // Deletes the entity
         act({role: options.role, zone: zone, base: base, name: name, cmd: 'delete', id: result.entity.id})
         .then(function (result) {
