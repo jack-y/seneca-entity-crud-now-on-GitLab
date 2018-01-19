@@ -4,7 +4,7 @@
 
 # seneca-entity-crud
 
-Last update: 09/06/2017
+Last update: 01/19/2018
 
 [![npm version][npm-badge]][npm-url]
 [![Build Status][travis-badge]][travis-url]
@@ -55,7 +55,7 @@ Less code. CRUD names. And the code is easier to understand.
 One very nice thing: in addition to CRUD, this plugin offers additional commands.
 
 - The `truncate` command works as traditional SQL `TRUNCATE TABLE my_table`.
-- The `query` command encapsulate the `list$` function.
+- The `query` command encapsulate the `list$` function with new features.
 - The `count` command encapsulate the `list$` function, but return only the count for network optimization.
 - The `deleterelationships` command extends the deletion of an entity to that of all its relations. See this [readme][] file.
 - The `check` command verify that the store works. It performs a create-then-delete operation. This is useful when the microservice using this plugin has a *health* process.
@@ -553,6 +553,31 @@ act({role: 'my-role', cmd: 'query', deepselect: myDeepSelect})
 In this example, only the entities whose city contains the zip code `'59491'` are retrieved.
 
 You can use together the select and deep select filters as you want.
+
+### selection
+
+The select [Query Syntax][] is not adapted to complex queries. There is no OR + AND mix. To respond to these cases, a **selection** optional argument can be added to the pattern: `selection: function (item) {... coding filters ...}` . If set, this selection argument must be a **function** with:
+
+- An unique argument: the list item to be proceed.
+- The return object must be a boolean: `true` if the argument item satisfies the selection, `false` otherwise.
+
+> Note: you can use `select`, `deepselect` and `selection` together.
+
+### selection example
+
+```js
+var mySelection = function (item) {
+  var filter_1 = item.title.indexOf('seneca') > -1
+  var filter_2 = item.description.indexOf('seneca') > -1
+  return filter_1 || filter_2
+}
+// Query
+act({role: 'my-role', cmd: 'query', selection: mySelection})
+.then(function(result) {
+  console.log(result.list)
+  return result
+})
+```
 
 ### Result object
 

@@ -158,5 +158,29 @@ describe('query', function () {
     })
   })
 
+  // Query with selection
+  it('selection', function (fin) {
+    // Sets the expected count
+    var expected = 4
+    // Gets the Seneca instance
+    var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
+    // Creates posts
+    testFunctions.createPosts(seneca, role, function (results) {
+      // Sets the selection function
+      var mySelection = function (item) {
+        return (item.title.indexOf('day') > -1) ||
+          (item.content.indexOf('cat') > -1)
+      }
+      // Retrieves all data
+      seneca.act({role: role, cmd: 'query', selection: mySelection}, function (ignore, result) {
+        // Checks result
+        expect(result.success).to.equal(true)
+        expect(result.list.length).to.equal(expected)
+        expect(result.count).to.equal(expected)
+        fin()
+      })
+    })
+  })
+
   //
 })

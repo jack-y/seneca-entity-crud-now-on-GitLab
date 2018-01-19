@@ -347,6 +347,7 @@ module.exports = function (options) {
     var deepSelect = args.deepselect ? args.deepselect : []
     var joinsList = args.joins ? args.joins : []
     var nonamespace = args.nonamespace || args.nonamespace === 'true'
+    var selection = args.selection ? args.selection : null
     // Gets the list from the database
     entityFactory.list$(select, (err, list) => {
       if (err) { throw err }
@@ -355,15 +356,15 @@ module.exports = function (options) {
         // Performs first the joins
         readJoinsForList(list, joinsList)
         .then(function (result) {
-          // Formats: deep select, nonamespace and defaults
-          var formattedList = formatList(result.list, deepSelect, nonamespace, defaults)
+          // Formats: deep select, selection, nonamespace and defaults
+          var formattedList = formatList(result.list, deepSelect, selection, nonamespace, defaults)
           // Returns the query result with joins
           return done(null, {success: true, list: formattedList, count: formattedList.length})
         })
       } else {
         // No joins first
-        // Formats: deep select, nonamespace and defaults
-        var formattedList = formatList(list, deepSelect, nonamespace, defaults)
+        // Formats: deep select, selection, nonamespace and defaults
+        var formattedList = formatList(list, deepSelect, selection, nonamespace, defaults)
         // Checks if joins are to be performed
         if (formattedList.length > 0 && joinsList.length > 0) {
           // Performs the joins
@@ -457,16 +458,26 @@ module.exports = function (options) {
 
   /* --------------- QUERY --------------- */
 
-  /* Formats the list: deep select, nonamespace and defaults */
-  function formatList (list, deepSelect, nonamespace, defaults) {
+  /* Formats the list: deep select, selection, nonamespace and defaults */
+  function formatList (list, deepSelect, selection, nonamespace, defaults) {
     // Initializes
     var deepList = list
-    // Process the deep selects
+    // Proceeds the deep selects
     if (deepSelect.length > 0 && list.length > 0) {
       // Loops on each deep select
       deepSelect.forEach(function (item) {
         deepList = selectDeep(deepList, item)
       })
+    }
+    // Proceeds the selection function
+    if (selection && typeof selection == 'function') {
+      var selectionList = []
+      for (let i = 0; i < deepList.length; i++) {
+        if (selection(deepList[i])) {
+          selectionList.push(deepList[i])
+        }
+      }
+      deepList = selectionList
     }
     // Removes the namespace
     if (nonamespace && deepList.length > 0) {
