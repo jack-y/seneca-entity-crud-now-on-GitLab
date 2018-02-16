@@ -1,11 +1,11 @@
-/* Copyright (c) 2017 e-soa Jacques Desodt, MIT License */
+/* Copyright (c) 2017-2018 e-soa Jacques Desodt, MIT License */
 'use strict'
 
 /* Default plugin options */
 const role = 'entity-crud-test'
 
 /* Prerequisites */
-const Seneca = require('seneca') // eslint-disable-line no-unused-vars
+const Seneca = require('seneca')
 const testFunctions = require('./functions')
 
 /* Test prerequisites */
@@ -17,56 +17,54 @@ var it = lab.it
 var expect = Code.expect
 
 describe('check', function () {
-  //
-  // All is OK
+  /* All is OK */
   it('ok', function (fin) {
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Test
+    /* Fires the test */
     seneca.act({role: role, cmd: 'check'}, function (ignore, result) {
-      // Checks result
+      /* Checks the result */
       expect(result.success).to.equal(true)
       fin()
     })
   })
-  // Error on create
+  /* Error on create */
   it('error on create', function (fin) {
-    // Initializes
+    /* Initializes */
     var error = 'error on create'
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Mocks the create action
+    /* Mocks the action */
     seneca.add('role:' + role + ',name:entity_test,cmd:create', function (args, done) {
       return done(null, {success: false, errors: [error]})
     })
-    // Test
+    /* Fires the test */
     seneca.act({role: role, cmd: 'check'}, function (ignore, result) {
-      // Checks result
+      /* Checks the result */
       expect(result.success).to.equal(false)
       expect(result.errors[0]).to.equal(error)
       expect(result.command).to.equal('create')
       fin()
     })
   })
-  // Error on delete
+  /* Error on delete */
   it('error on delete', function (fin) {
-    // Initializes
+    /* Initializes */
     var error = 'error on delete'
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Mocks the delete action
+    /* Mocks the action */
     seneca.add('role:' + role + ',name:entity_test,cmd:delete', function (args, done) {
-      // Returns the delete on error
+      /* Returns the delete on error */
       return done(null, {success: false, errors: [error]})
     })
-    // Test
+    /* Fires the test */
     seneca.act({role: role, cmd: 'check'}, function (ignore, result) {
-      // Checks result
+      /* Checks the result */
       expect(result.success).to.equal(false)
       expect(result.errors[0]).to.equal(error)
       expect(result.command).to.equal('delete')
       fin()
     })
   })
-  //
 })

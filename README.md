@@ -4,7 +4,7 @@
 
 # seneca-entity-crud
 
-Last update: 01/19/2018
+Last update: 02/16/2018
 
 [![npm version][npm-badge]][npm-url]
 [![Build Status][travis-badge]][travis-url]
@@ -64,6 +64,7 @@ And we even lie on the floor:
 
 - This plugin includes an optional input data validation functionality to be used before the create or update action.
 - A `last_update` date value can be automatically added to each entity when created or updated.
+- The [appends][] feature provides additional actions during read or query.
 - The [joins][] feature provides deep readings from IDs contained in entities.
 - For security, using the optional `nonamespace: true` argument, the namespace of the resulting entities is automatically removed.
 - Defaults can be added to the resulting entities.
@@ -108,7 +109,7 @@ For more information on role, see the [seneca patterns][] guide.
 
 ### Usage
 
-Process each **seneca-entity-crud** command as any seneca command. Here is a full example for the `create` command, using the seneca-mem-store persistence plugin:
+Proceed each **seneca-entity-crud** command as any seneca command. Here is a full example for the `create` command, using the seneca-mem-store persistence plugin:
 
 ```js
 'use strict'
@@ -279,7 +280,9 @@ You can pass a `nonamespace: true` argument to remove the namespace of the resul
 
 You can pass a `defaults` argument to add defaults to the resulting entity. See the previous chapter: [Defaults](#defaults).
 
-You can pass a `joins` value to process deep reading from IDs contained in the entity. See the [joins][] feature.
+You can pass a `appends` value to perform others actions during one read. See the [appends][] feature.
+
+You can pass a `joins` value to proceed deep reading from IDs contained in the entity. See the [joins][] feature.
 
 ### Example
 
@@ -474,12 +477,11 @@ In the application, if the `truncate` action is intended to publish the generate
 ```js
 act({role: 'my-role', cmd: 'query'})
 .then(function(result) {
-  var cmds = []
+  var promises = []
   result.list.forEach(function(item) {
-    var command = act({role: 'my-role', cmd: 'delete', id: item.id})
-    cmds.push(command)    
+    promises.push(act({role: 'my-role', cmd: 'delete', id: item.id}))    
   })
-  promise.all(cmds)
+  promise.all(promises)
   .then(function (results) {
     // Do some stuff...
     return results
@@ -501,7 +503,9 @@ You can pass a `nonamespace: true` argument to remove the namespace of the resul
 
 You can pass a `defaults` argument to add defaults to the resulting entities. See the previous chapter: [Defaults](#defaults).
 
-You can pass a `joins` value to process deep reading from IDs contained in the entities. See the [joins][] feature.
+You can pass a `appends` value to perform others actions during the query. See the [appends][] feature.
+
+You can pass a `joins` value to proceed deep reading from IDs contained in the entities. See the [joins][] feature.
 
 ### select
 
@@ -699,6 +703,7 @@ Licensed under [MIT][].
 [shortid]: https://cnpmjs.org/package/shortid
 [Query syntax]: http://senecajs.org/docs/tutorials/understanding-query-syntax.html
 [seneca mesh]: https://github.com/senecajs/seneca-mesh
+[appends]: https://github.com/jack-y/seneca-entity-crud/blob/master/README-APPENDS.md
 [joins]: https://github.com/jack-y/seneca-entity-crud/blob/master/README-JOINS.md
 [readme]: https://github.com/jack-y/seneca-entity-crud/blob/master/relationships/README.md
 [triggers]: https://github.com/jack-y/seneca-triggers
