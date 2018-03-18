@@ -19,6 +19,11 @@ exports.setSeneca = function (Seneca, role, fin, print) {
       name: 'entity_test',
       last_update: true
     })
+    .use('../entity-crud', {
+      role: 'author',
+      name: 'author',
+      last_update: true
+    })
     .error(fin)
     .gate()
 }
@@ -41,24 +46,45 @@ exports.validatePost = function (args) {
   })
 }
 
-exports.createPosts = function (seneca, role, done) {
-  var cmds = []
-  getAllPosts().forEach(function (item) {
-    var command = createOnePost(seneca, role, item)
-    cmds.push(command)
+exports.createAuthors = function (seneca, role, done) {
+  var promises = []
+  getAllAuthors().forEach(function (item) {
+    promises.push(createEntity(seneca, role, item))
   })
-  promise.all(cmds)
+  promise.all(promises)
   .then(function (results) {
     return done(results)
   })
 }
 
-function createOnePost (seneca, role, entity) {
+function createEntity (seneca, role, entity) {
   return new Promise(function (resolve, reject) {
     seneca.act({role: role, cmd: 'create', entity: entity}, function (ignore, result) {
       return resolve(result)
     })
   })
+}
+
+exports.createPosts = function (seneca, role, done) {
+  var promises = []
+  getAllPosts().forEach(function (item) {
+    promises.push(createEntity(seneca, role, item))
+  })
+  promise.all(promises)
+  .then(function (results) {
+    return done(results)
+  })
+}
+
+exports.getAuthors = function () {
+  return getAllAuthors()
+}
+
+function getAllAuthors () {
+  return [
+    {author: 'John Deuf', city: 'New York'},
+    {author: 'Jim Foo', city: 'San Francisco'}
+  ]
 }
 
 exports.getPosts = function () {
@@ -69,10 +95,10 @@ function getAllPosts () {
   var author = 'John Deuf'
   var zipcode = '59491'
   return [
-    {title: 'The life of cats', content: '<h1>This is a great post about cats</h1><p>Maoww</p>', data: {zipcode: zipcode, number: 15}},
+    {title: 'The life of cats', content: '<h1>Maoww</h1>', data: {zipcode: zipcode, number: 15}},
     {title: 'Monday', content: 'The week begins!', data: {jobi: 'joba'}},
     {title: 'Tuesday', content: 'Ruby tuesday?', author: author, data: {zipcode: zipcode, number: 7}},
-    {title: 'Life on Mars', content: 'Listen to this song written by David Bowie.', data: {zipcode: zipcode, number: 15}},
+    {title: 'Life on Mars', content: 'Great song by David Bowie.', data: {zipcode: zipcode, number: 15}},
     {title: 'Tuesday', content: 'The week continues...', author: author, data: {zipcode: zipcode, number: 69}}
   ]
 }

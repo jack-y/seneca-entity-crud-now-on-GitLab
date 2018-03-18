@@ -169,7 +169,7 @@ describe('query', function () {
       // Sets the selection function
       var mySelection = function (item) {
         return (item.title.indexOf('day') > -1) ||
-          (item.content.indexOf('cat') > -1)
+          (item.content.indexOf('Maoww') > -1)
       }
       // Retrieves all data
       seneca.act({role: role, cmd: 'query', selection: mySelection}, function (ignore, result) {

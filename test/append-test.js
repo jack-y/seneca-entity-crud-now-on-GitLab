@@ -1,8 +1,5 @@
-/* Copyright (c) 2017 e-soa Jacques Desodt, MIT License */
+/* Copyright (c) 2017-2018 e-soa Jacques Desodt, MIT License */
 'use strict'
-
-/* Default plugin options */
-const role = 'entity-crud-test'
 
 /* Prerequisites */
 const processAppend = require('../process/append')

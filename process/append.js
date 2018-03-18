@@ -73,25 +73,38 @@ processAppend.readAppendsForList = function (act, list, appends) {
 /* Reads the data specified by the append */
 processAppend.readOneAppend = function (act, originEntity, append) {
   return new Promise(function (resolve, reject) {
-    /* Gets the action */
+    /* Initializes */
     var action = append.action
+    var fieldname = append.resultname ? append.resultname : append.action.role
     /* Adds the optional select to the action */
     if (append.select) {
-      /* Initializes */
-      if (!action.select) { action.select = {}}
-      /* Adds the select */
-      action.select[append.select.idname] = originEntity[append.select.valuename]
+      /* Checks if the selection value is set */
+      if (originEntity[append.select.valuename]) {
+        /* Initializes */
+        if (!action.select) { action.select = {}}
+        /* Adds the select */
+        action.select[append.select.idname] = originEntity[append.select.valuename]
+        /* Performs the action */
+        act(action)
+        .then(function (result) {
+          /* Adds the result to the origin entity */
+          originEntity[fieldname] = result
+          return resolve({entity: originEntity})
+        })
+        .catch(function (err) { return reject(err) })
+      } else {
+        return resolve({entity: originEntity})
+      }
+    } else {
+      /* Performs the action */
+      act(action)
+      .then(function (result) {
+        /* Adds the result to the origin entity */
+        originEntity[fieldname] = result
+        return resolve({entity: originEntity})
+      })
+      .catch(function (err) { return reject(err) })
     }
-    /* Sets the new field name */
-    var fieldname = append.resultname ? append.resultname : append.action.role
-    /* Performs the action */
-    act(action)
-    .then(function (result) {
-      /* Adds the result to the origin entity */
-      originEntity[fieldname] = result
-      return resolve({entity: originEntity})
-    })
-    .catch(function (err) { return reject(err) })
   })
 }
 

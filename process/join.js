@@ -12,7 +12,7 @@ var processJoin = {}
 processJoin.join = function (act, entity, joins) {
   return new Promise(function (resolve, reject) {
     /* Checks if the entity and the joins array are defined */
-    if (entity && joins) {
+    if (entity && joins && joins.length) {
       /* Performs the joins reading */
       processJoin.readJoins(act, entity, joins)
       .then(function (result) {
@@ -30,13 +30,15 @@ processJoin.join = function (act, entity, joins) {
 processJoin.readJoins = function (act, entity, joins) {
   return new Promise(function (resolve, reject) {
     var count = 0
+    var updatedEntity = entity
     /* Loops on each join */
     joins.forEach(function (join, index) {
-      processJoin.readOneJoin(act, entity, join)
+      processJoin.readOneJoin(act, updatedEntity, join)
       .then(function (result) {
+        updatedEntity = result.entity
         if (++count === joins.length) {
           /* When all joins are done, returns the full entity */
-          return resolve({entity: result.entity})
+          return resolve({entity: updatedEntity})
         }
       })
       .catch(function (err) { return reject(err) })
