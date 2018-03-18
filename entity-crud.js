@@ -160,7 +160,7 @@ module.exports = function (options) {
           processAppend.append(act, entity_2, args.appends)
           .then(function (entity_3) {
             /* Returns the read entity or success = false */
-            done(null, {success: (entity !== null), entity: entity_2})
+            done(null, {success: (entity !== null), entity: entity_3})
           })
           .catch(function (err) { throw err })
         })

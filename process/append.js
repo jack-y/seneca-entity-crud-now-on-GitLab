@@ -12,7 +12,7 @@ var processAppend = {}
 processAppend.append = function (act, entity, appends) {
   return new Promise(function (resolve, reject) {
     /* Checks if the entity and the appends array are defined */
-    if (entity && appends) {
+    if (entity && appends && appends.length) {
       /* Performs the appends reading */
       processAppend.readAppends(act, entity, appends)
       .then(function (result) {
@@ -30,13 +30,15 @@ processAppend.append = function (act, entity, appends) {
 processAppend.readAppends = function (act, entity, appends) {
   return new Promise(function (resolve, reject) {
     var count = 0
+    var updatedEntity = entity
     /* Loops on each join */
     appends.forEach(function (append, index) {
-      processAppend.readOneAppend(act, entity, append)
+      processAppend.readOneAppend(act, updatedEntity, append)
       .then(function (result) {
+        updatedEntity = result.entity
         if (++count === appends.length) {
           /* When all appends are done, returns the full entity */
-          return resolve({entity: result.entity})
+          return resolve({entity: updatedEntity})
         }
       })
       .catch(function (err) { return reject(err) })
