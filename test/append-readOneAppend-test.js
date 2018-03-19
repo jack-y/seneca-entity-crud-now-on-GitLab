@@ -22,10 +22,9 @@ describe('append readOneAppend', function () {
     processAppend.readOneAppend(act, entity, getAppend())
     .then(function (result) {
       /* Checks the result */
-      expect(result.entity.id).to.equal(entity.id)
-      expect(result.entity[getAppend().resultname]).to.exist()
-      expect(result.entity[getAppend().resultname].list.length).to.equal(1)
-      expect(result.entity[getAppend().resultname].list[0].id).to.equal(entity.id_city)
+      expect(result[getAppend().resultname]).to.exist()
+      expect(result[getAppend().resultname].list.length).to.equal(1)
+      expect(result[getAppend().resultname].list[0].id).to.equal(entity.id_city)
       fin()
     })
   })

@@ -160,7 +160,7 @@ module.exports = function (options) {
           processAppend.append(act, entity_2, args.appends)
           .then(function (entity_3) {
             /* Returns the read entity or success = false */
-            done(null, {success: (entity !== null), entity: entity_3})
+            done(null, {success: (entity_3 !== null), entity: entity_3})
           })
           .catch(function (err) { throw err })
         })
@@ -337,8 +337,8 @@ module.exports = function (options) {
           /* Adds the appends data */
           processAppend.readAppendsForList(act, formattedList, args.appends)
           .then(function (appendResult) {
-            /* Returns the query result with joins */
-            return done(null, {success: true, list: appendResult.list, count: appendResult.list.length})
+            /* Returns the query result with appends */
+            return done(null, {success: true, list: appendResult, count: appendResult.length})
           })
           .catch(function (err) { throw err })
         })
@@ -353,8 +353,8 @@ module.exports = function (options) {
           /* Adds the appends data */
           processAppend.readAppendsForList(act, result.list, args.appends)
           .then(function (appendResult) {
-            /* Returns the query result with joins */
-            return done(null, {success: true, list: appendResult.list, count: appendResult.list.length})
+            /* Returns the query result with appends */
+            return done(null, {success: true, list: appendResult, count: appendResult.length})
           })
           .catch(function (err) { throw err })
         })

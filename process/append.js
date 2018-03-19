@@ -6,6 +6,9 @@
    See: https://github.com/jack-y/seneca-entity-crud/blob/master/README-APPENDS.md
 */
 
+const promise = require('bluebird')
+
+/* Prerequisites */
 var processAppend = {}
 
 /* Proceeds all the appends */
@@ -15,11 +18,8 @@ processAppend.append = function (act, entity, appends) {
     if (entity && appends && appends.length) {
       /* Performs the appends reading */
       processAppend.readAppends(act, entity, appends)
-      .then(function (result) {
-        /* Returns the read entity with appends */
-        return resolve(result.entity)
-      })
-      .catch(function (err) { return reject(err) })
+      .then(function (result) { return resolve(result) })
+      .catch(function (err) {return reject(err) })
     } else {
       return resolve(entity)
     }
@@ -29,79 +29,89 @@ processAppend.append = function (act, entity, appends) {
 /* Reads the appends for one entity */
 processAppend.readAppends = function (act, entity, appends) {
   return new Promise(function (resolve, reject) {
-    var count = 0
-    var updatedEntity = entity
-    /* Loops on each join */
-    appends.forEach(function (append, index) {
-      processAppend.readOneAppend(act, updatedEntity, append)
-      .then(function (result) {
-        updatedEntity = result.entity
-        if (++count === appends.length) {
-          /* When all appends are done, returns the full entity */
-          return resolve({entity: updatedEntity})
-        }
-      })
-      .catch(function (err) { return reject(err) })
-    })
+    /* Checks if the appends are set */
+    if (appends && appends.length) {
+      /* Initializes */
+      var promises = []
+      /* Sets the promises */
+      for (var i = 0; i < appends.length; i++) {
+        promises.push(processAppend.readOneAppend(act, entity, appends[i]))
+      }
+      /* Runs the promises */
+      if (promises.length > 0) {
+        promise.all(promises)
+        .then(function (results) {
+          /* Loops on each append result */
+          for (var i = 0; i < results.length; i++) {
+            if (results[i]) {
+              entity = Object.assign(results[i], entity)
+            }
+          }
+          return resolve(entity)
+        })
+      } else {
+        return resolve(entity)
+      }
+    } else {
+      return resolve(entity)
+    }
   })
 }
 
-/* Process appends on a list of entities */
+/* Proceeds appends on a list of entities */
 processAppend.readAppendsForList = function (act, list, appends) {
   return new Promise(function (resolve, reject) {
-    if (list.length > 0 && appends && appends.length > 0) {
-      var newList = []
-      var itemread = 0
-      /* Loops on each entity */
-      list.forEach(function (entity, index) {
-        /* Proceeds the appends on the entity */
-        processAppend.readAppends(act, entity, appends)
-        .then(function (result) {
-          newList.push(result.entity)
-          if (++itemread === list.length) {
-            /* When all appends are done, returns the full list */
-            return resolve({list: newList})
-          }
-        })
-      })
+    /* Initializes */
+    var promises = []
+    /* Loops on the entites */
+    for (var i = 0; i < list.length; i++) {
+      promises.push(processAppend.readAppends(act, list[i], appends))
+    }
+    /* Runs the promises */
+    if (promises.length > 0) {
+      promise.all(promises)
+      .then(function (results) { return resolve(results) })
     } else {
-      return resolve({list: list})
+      return resolve(list)
     }
   })
 }
 
 /* Reads the data specified by the append */
-processAppend.readOneAppend = function (act, originEntity, append) {
+processAppend.readOneAppend = function (act, entity, append) {
   return new Promise(function (resolve, reject) {
     /* Initializes */
-    var action = append.action
+    var action = Object.assign({}, append.action)
     var fieldname = append.resultname ? append.resultname : append.action.role
     /* Adds the optional select to the action */
     if (append.select) {
-      /* Checks if the selection value is set */
-      if (originEntity[append.select.valuename]) {
+      /* The selection value must be set in the entity */
+      if (entity[append.select.valuename]) {
         /* Initializes */
         if (!action.select) { action.select = {}}
         /* Adds the select */
-        action.select[append.select.idname] = originEntity[append.select.valuename]
+        action.select[append.select.idname] = entity[append.select.valuename]
         /* Performs the action */
         act(action)
         .then(function (result) {
-          /* Adds the result to the origin entity */
-          originEntity[fieldname] = result
-          return resolve({entity: originEntity})
+          /* Returns the result */
+          var response = {}
+          response[fieldname] = result
+          return resolve(response)
         })
         .catch(function (err) { return reject(err) })
       } else {
-        return resolve({entity: originEntity})
+        /* The selection value is not set in the entity: the selection cannot be performed */
+        return resolve(null)
       }
     } else {
-      /* Performs the action */
+      /* No select required: performs the action */
       act(action)
       .then(function (result) {
-        /* Adds the result to the origin entity */
-        originEntity[fieldname] = result
-        return resolve({entity: originEntity})
+        /* Returns the result */
+        var response = {}
+        response[fieldname] = result
+        return resolve(response)
       })
       .catch(function (err) { return reject(err) })
     }
