@@ -4,7 +4,7 @@
 
 # seneca-entity-crud
 
-Last update: 02/16/2018
+Last update: 04/02/2018
 
 [![npm version][npm-badge]][npm-url]
 [![Build Status][travis-badge]][travis-url]
@@ -52,13 +52,18 @@ act({role: myRole, cmd: 'read', id: anId})
 
 Less code. CRUD names. And the code is easier to understand.
 
+
+
 One very nice thing: in addition to CRUD, this plugin offers additional commands.
 
-- The `truncate` command works as traditional SQL `TRUNCATE TABLE my_table`.
-- The `query` command encapsulate the `list$` function with new features.
+- The `check` command verify that the store works. It performs a create-then-delete operation. This is useful when the microservice using this plugin has a *health* process.
 - The `count` command encapsulate the `list$` function, but return only the count for network optimization.
 - The `deleterelationships` command extends the deletion of an entity to that of all its relations. See this [readme][] file.
-- The `check` command verify that the store works. It performs a create-then-delete operation. This is useful when the microservice using this plugin has a *health* process.
+- The `query` command encapsulate the `list$` function with new features.
+- The `truncate` command works as traditional SQL `TRUNCATE TABLE my_table`.
+
+
+
 
 And we even lie on the floor:
 
@@ -163,7 +168,7 @@ For **the list of the commands** and their arguments, see the chapter below: [AP
 
 In most cases, it's a best practice to validate input data before insert it in the database. The **seneca-entity-crud** plugin cannot validate input data by itself: it strongly depend on your application data types. However, if you need to proceed input data validation, this plugin can use your prefered function.
 
-For more information, please see the [validate action readme][] file.
+For more information and examples, please see the [input data validation][] documentation.
 
 # The returned namespace
 
@@ -188,7 +193,7 @@ For more information on zone, base and name, see the [entity namespace][] tutori
 
 # Defaults
 
-This plugin can automatically add defaults to the resulting entities of a [read](#read) or [query](#query) command.
+This plugin can automatically add defaults to the resulting entities of a [read][] or [query][] command.
 
 > Note: this feature is optional.
 
@@ -204,7 +209,7 @@ If the resulting entity already contains the field `a field name`, nothing is ch
 
 ### How it works
 
-Add the defaults object to the [read](#read) or [query](#query) command pattern:
+Add the defaults object to the [read][] or [query][] command pattern:
 
 ```js
 {role: 'my-role', cmd: 'read', id: anId, defaults: { ... }}
@@ -229,435 +234,20 @@ The console output looks like:
 {id: '5a4732ef4049cfcb07d992007e003932', ... , country: 'Belgium', currency: 'Euro'}
 ```
 
-
 # API commands specifications
 
-## create
+* **[check][]**: verify that the store can create-then-delete an entity.
+* **[count][]**: retrieve the count of the entities from your database. 
+* **[create][]**: insert a new entity into your database.
+* **[delete][]**: remove an entity from your database.
+* **[deleterelationships][]**: remove all relationships of an entity from your database.
+* **[first][]**: retrieve from your database the first entity matching filters.
+* **[query][]**: retrieve a list of entities from your database. 
+* **[read][]**: retrieve an entity from your database.
+* **[truncate][]**: remove all the entities from your database. 
+* **[update][]**: update an entity previously created into your database.
+* **[validate][]**: validate your data.
 
-Use this command to add a new entity into your database. The pattern is:
-
-```js
-{role: 'my-role', cmd: 'create', entity: newEntity}
-```
-
-You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
-
-You can proceed to input data validation before the creation. See the [validate action readme][] file.
-
-You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
-
-### Example
-
-```js
-var myEntity = {title: 'The life of cats', content: '<h1>This is a post about cats</h1><p>Maoww...</p>'}
-// Create
-act({role: 'my-role', cmd: 'create', entity: myEntity)
-.then(function (result) {
-  console.log('My entity ID is: ' + result.entity.id)
-  return result
-})
-```
-
-### Result object
-
-- **success**: `true` or `false`. `false` is returned if the input data validation is used and fails.
-- **errors**: an array. If the input data validation is used and fails, `errors` is the array of error objects. An exemple of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
-- **entity**: if there is no input data validation or if it has succeeded, this value is the input entity updated with its `id` field set. If the `last_update` plugin option is set to `true`, this value has its `last_update` field set with the current date.
-
-> Note: the ID generated for the entity is provided by the store plugin used in your application.
-
-## read
-
-Use this command to retrieve an entity from your database. The pattern is:
-
-```js
-{role: 'my-role', cmd: 'read', id: anId}
-```
-
-You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
-
-You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
-
-You can pass a `defaults` argument to add defaults to the resulting entity. See the previous chapter: [Defaults](#defaults).
-
-You can pass a `appends` value to perform others actions during one read. See the [appends][] feature.
-
-You can pass a `joins` value to proceed deep reading from IDs contained in the entity. See the [joins][] feature.
-
-### Example
-
-```js
-var myId = '5a4732ef4049cfcb07d992007e003932'
-// Read
-act({role: 'my-role', cmd: 'read', id: myId})
-.then(function (result) {
-  console.log('My entity is: ' + JSON.stringify(result.entity))
-  return result
-})
-```
-
-### Result object
-
-- **success**: `true` or `false`. `false` is returned if the entity is not found.
-- **entity**: the entity read from the database, or null if it is not found.
-
-## update
-
-Use this command to update an entity previously inserted into your database. The pattern is:
-
-```js
-{role: 'my-role', cmd: 'update', entity: anEntity}
-```
-
-You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
-
-You can proceed to input data validation before the update. See the [validate action readme][] file.
-
-You can pass a `nonamespace: true` argument to remove the namespace of the resulting entity. See the previous chapter: [The returned namespace](#the-returned-namespace).
-
-The entity ID must be found in the database. If not, a `success: false` result is fired.
-
-Not all fields must always be updated in the past entity as an argument. Only the ID and fields to be updated or inserted are required. However, depending on the used store plugin, the **save$** seneca-entity action can remove undeclared fields from the database. To avoid this, the **update** command is equal to a read-assign-save action. Undeclared fields remain unchanged.
-
-Updating or inserting fields uses the `assign` javascript function, like:
-
-```
-Origin database entity: {id:'1234', name: 'John Doe', phone: 789}
-Update command entity: {id: '1234', phone: 0001, email: 'me@server.com'}
--> Final database entity: {id:'1234', name: 'John Doe', phone: 0001, email: 'me@server.com'}
-```
-
-### Example
-
-```js
-var myEntity = {id: '5a4732ef4049cfcb07d992007e003932', title: 'A new title', content: '<h1>This is a post about cats</h1><p>Maoww...</p>'}
-// Update
-act({role: 'my-role', cmd: 'update', entity: myEntity})
-.then(function (result) {
-  console.log('My entity last update is: ' + result.entity.last_update)
-  return result
-})
-```
-
-### Result object
-
-- **success**: `true` or `false`. `false` is returned if the input data validation is used and fail, or if the entity ID is not found.
-- **errors**: an array. If the input data validation is used and fail, `errors` is the array of error objects. An example of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
-- **entity**: if there is no data validation or if it has succeeded, this value is the input entity updated. If the `last_update` plugin option is set to `true`, this value has its `last_update` field set with the current date.
-
-## delete
-
-Use this command to remove an entity from your database. The pattern is:
-
-```js
-{role: 'my-role', cmd: 'delete', id: anId}
-```
-
-You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
-
-### Example
-
-```js
-var myId = '5a4732ef4049cfcb07d992007e003932'
-// Delete
-act({role: 'my-role', cmd: 'delete', id: myId})
-.then(function (result) {
-  console.log('Id ' + myId + ' deleted.')
-  return result
-})
-```
-
-### Result object
-
-- **success**: `true`.
-
-## validate
-
-Use this command to validate your data. The pattern is:
-
-```js
-{role: role, cmd: 'validate', entity: myEntity, validate_function: myFunction}
-```
-
-### Explanations and example
-
-See the [validate action readme][] file.
-
-### Result object
-
-- **success**: `true` or `false`
-- **errors**: an array of error objects. An example of the error format can be: `{field: 'a name', actual: 'a value', error: 'an error message'}`.
-
-If there is no validation error, `success` is set to `true` and the errors array is set empty:
-
-```js
-{success: true, errors: []}
-```
-
-## deleterelationships
-
-Use this command to remove all relationships of an entity from your database.
-For more explanations, see this [readme][] file.
-
-The pattern is:
-
-```js
-{
-  role: 'my-role',
-  cmd: 'deleterelationships',
-  id: 'an-id',
-  relationships: [ ... an array of relationships ... ]
-}
-```
-
-You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
-
-For more explanations, see this [readme][] file.
-
-### Example
-
-```js
-var myId = '5a4732ef4049cfcb07d992007e003932'
-// Delete
-act({role: 'my-role', cmd: 'deleterelationships', id: myId, relationships: myModel})
-.then(function (result) {
-  console.log('Id ' + myId + ' relationships deleted.')
-  return result
-})
-```
-
-### Result object
-
-- **success**: `true`.
-- **results**: an array of subquery results.
-
-A **subquery** is the `query` action fired for each relationship before deletion. The subquery returns the entities to be deleted for its relationship.
-Each subquery result contains:
-
-- **success**: the value of the subquery `success` result.
-- **role**: the role of the relationship.
-- **zone**: the optional zone of the relationship, or `null`.
-- **base**: the optional base of the relationship, or `null`. 
-- **name**: the name of the relationship.
-- **count**: the number of entities found in this relationship.
-
-## truncate
-
-Use this command to remove all the entities from your database. The pattern is:
-
-```js
-{role: 'my-role', cmd: 'truncate'}
-```
-
-You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
-
-### Example
-
-```js
-// Truncate
-act({role: 'my-role', cmd: 'truncate'})
-.then(function(result) {
-  console.log('No more data. Go home.')
-  return result
-})
-```
-
-### Result object
-
-- **success**: `true`.
-
-> Note: at this time, the truncate command execute a remove$ action entity by entity. It does not perform well. If you know a better solution, we take!
-
-### truncate and seneca-mesh
-
-The `truncate` action generates a `delete` action that is immediately consumed by this plugin. **There is no publication of the `delete` action at the top-level mesh base or service**: this plugin can't know this top-level. This behavior depends on the application itself.
-
-In the application, if the `truncate` action is intended to publish the generated `delete` actions, we should use this kind of code instead:
-
-```js
-act({role: 'my-role', cmd: 'query'})
-.then(function(result) {
-  var promises = []
-  result.list.forEach(function(item) {
-    promises.push(act({role: 'my-role', cmd: 'delete', id: item.id}))    
-  })
-  promise.all(promises)
-  .then(function (results) {
-    // Do some stuff...
-    return results
-  })
-})
-```
-
-## query
-
-Use this command to retrieve a list of entities from your database. The pattern is:
-
-```js
-{role: 'my-role', cmd: 'query'}
-```
-
-You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
-
-You can pass a `nonamespace: true` argument to remove the namespace of the resulting entities. See the previous chapter: [The returned namespace](#the-returned-namespace).
-
-You can pass a `defaults` argument to add defaults to the resulting entities. See the previous chapter: [Defaults](#defaults).
-
-You can pass a `appends` value to perform others actions during the query. See the [appends][] feature.
-
-You can pass a `joins` value to proceed deep reading from IDs contained in the entities. See the [joins][] feature.
-
-### select
-
-A **select** optional argument can be added to the pattern: `select: {... some filters ...}` . If no select argument is provided, an empty select object is used. The select argument support the standard Seneca query format:
-
-- `select: {f1:v1, f2:v2, ...}` implies pseudo-query `f1==v1 AND f2==v2, ...`.
-- `select: {{f1:v1,...}, {sort$:{field1:1}}` means sort by f1, ascending.
-- `select: {{f1:v1,...}, {sort$:{field1:-1}}` means sort by f1, descending.
-- `select: {{f1:v1,...}, {limit$:10}}` means only return 10 results.
-- `select: {{f1:v1,...}, {skip$:5}}` means skip the first 5.
-- `select: {{f1:v1,...}, {fields$:['fd1','f2']}}` means only return the listed fields.
-
-> Note: you can use `sort$`, `limit$`, `skip$` and `fields$` together.
-
-For more information, see the seneca [Query Syntax][] tutorial.
-
-### select example
-
-```js
-var mySelect = {title: 'About seneca'}
-// Query
-act({role: 'my-role', cmd: 'query', select: mySelect})
-.then(function(result) {
-  console.log(result.list)
-  return result
-})
-```
-
-### deep select
-
-A **deepselect** optional argument can be added to the pattern. If no `deepselect` argument is provided, an empty array is used. The `deepselect` argument is a list of filters, acting as an `AND` combination.
-
-A deep select filter is a JSON string with a property name, and a value the property must match. This is a useful search feature on nested objects.
-
-### deep select example
-
-```js
-var myDeepSelect = [
-  {property: 'city.zipcode', value: '59491'}
-]
-// Query
-act({role: 'my-role', cmd: 'query', deepselect: myDeepSelect})
-.then(function(result) {
-  console.log(result.list)
-  return result
-})
-```
-
-In this example, only the entities whose city contains the zip code `'59491'` are retrieved.
-
-You can use together the select and deep select filters as you want.
-
-### selection
-
-The select [Query Syntax][] is not adapted to complex queries. There is no OR + AND mix. To respond to these cases, a **selection** optional argument can be added to the pattern: `selection: function (item) {... coding filters ...}` . If set, this selection argument must be a **function** with:
-
-- An unique argument: the list item to be proceed.
-- The return object must be a boolean: `true` if the argument item satisfies the selection, `false` otherwise.
-
-> Note: you can use `select`, `deepselect` and `selection` together.
-
-### selection example
-
-```js
-var mySelection = function (item) {
-  var filter_1 = item.title.indexOf('seneca') > -1
-  var filter_2 = item.description.indexOf('seneca') > -1
-  return filter_1 || filter_2
-}
-// Query
-act({role: 'my-role', cmd: 'query', selection: mySelection})
-.then(function(result) {
-  console.log(result.list)
-  return result
-})
-```
-
-### Result object
-
-- **success**: `true`.
-- **list**: the entities array, according to the filters. If no entity match the filters, an empty array is returned.
-- **count**: the number of entities, according to the filters. If no entity match the filters, the `0` value is returned.
-
-## count
-
-Use this command to retrieve a number of entities from your database. The pattern is:
-
-```js
-{role: 'my-role', cmd: 'count'}
-```
-
-You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
-
-As the query command, the count command can use select and deep select filters. See the previous [query command](#query) for more explanations.
-
-### Example
-
-```js
-var mySelect = {title: 'About seneca'}
-var myDeepSelect = [
-  {property: 'city.zipcode', value: '59491'}
-]
-// Count
-act({role: 'my-role', cmd: 'count', select: mySelect, deepselect: myDeepSelect})
-.then(function(result) {
-  console.log(result.count)
-  return result
-})
-```
-
-### Result object
-
-- **success**: `true`.
-- **count**: the number of entities, according to the filters. If no entity match the filters, the `0` value is returned.
-
-## check
-
-Use this command to verify that the store can create-then-delete an entity. The pattern is:
-
-```js
-{role: 'my-role', cmd: 'check'}
-```
-
-You can pass `base`, `zone` and `name` of your entity namespace as optional arguments to override the options.
-
-The default entity object used to be created then deleted is:
-
-```js
-{check: 'check'}
-```
-
-You can pass an `entity` argument to override this default object. 
-
-### Example
-
-```js
-// Check
-act({role: 'my-role', cmd: 'check'})
-.then(function(result) {
-  if (!result.success) {
-    // ... do some stuff with the error ...
-    console.log('Oops, check returns an error.')
-  }
-  return result
-})
-```
-
-### Result object
-
-- **success**: `true` or `false`. `true` if the create-then-delete operation is successful, `false` otherwise.
-- **errors**: an array. It contains the error objects returned by the create-then-delete operation when it fails.
-- **command**: `create` or `delete`. The name of the command which fires the error when the create-then-delete operation fails.
 
 # Install
 
@@ -679,7 +269,7 @@ npm test
 The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.
 
 ## License
-Copyright (c) 2016-2017, Richard Rodger and other contributors.
+Copyright (c) 2016-2018, Richard Rodger and other contributors.
 Licensed under [MIT][].
 
 [MIT]: ./LICENSE
@@ -701,10 +291,20 @@ Licensed under [MIT][].
 [entity namespace]: http://senecajs.org/docs/tutorials/understanding-data-entities.html#zone-base-and-name-the-entity-namespace
 [seneca patterns]: http://senecajs.org/getting-started/#patterns
 [shortid]: https://cnpmjs.org/package/shortid
-[Query syntax]: http://senecajs.org/docs/tutorials/understanding-query-syntax.html
-[seneca mesh]: https://github.com/senecajs/seneca-mesh
-[appends]: https://github.com/jack-y/seneca-entity-crud/blob/master/README-APPENDS.md
-[joins]: https://github.com/jack-y/seneca-entity-crud/blob/master/README-JOINS.md
-[readme]: https://github.com/jack-y/seneca-entity-crud/blob/master/relationships/README.md
+
+[appends]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/appends.md
+[count]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/count.md
+[create]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-create.md
+[delete]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-delete.md
+[deleterelationqhipq]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/deleterelationships.md
+[first]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/first.md
+[joins]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/joins.md
+[query]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/query.md
+[read]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-read.md
+[truncate]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/truncate.md
+[update]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-update.md
+[validate]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/validate.md
+
+[readme]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/relational-delete-feature.md
 [triggers]: https://github.com/jack-y/seneca-triggers
-[validate action readme]: https://github.com/jack-y/seneca-entity-crud/blob/master/README-VALIDATE.md
+[input data validation]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/input-data-validation.md

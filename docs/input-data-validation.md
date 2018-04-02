@@ -1,6 +1,6 @@
 # Input data validation
 
-Last update: 07/07/2017
+Last update: 04/02/2018
 
 In most cases, it's a best practice to validate input data before insert it in the database. The **seneca-entity-crud** plugin cannot validate input data by itself: it strongly depend on your application data types. However, if you need to proceed input data validation, this plugin can use your prefered function.
 
@@ -13,8 +13,6 @@ Pass your prefered function to the `validate` action. The pattern is:
 ```js
 {role: role, cmd: 'validate', entity: myEntity, validate_function: myFunction}
 ```
-
-For more details, see the chapter [validate][].
 
 ### Validation and triggers
 
@@ -242,14 +240,4 @@ errors: [{"field":"title","actual":null,"error":"the title is required"}]
 
 and, as previously, the message `This message will never be shown.` ...will never be shown ;).
 
-# Contributing
-The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.
-
-## License
-Copyright (c) 2017, Richard Rodger and other contributors.
-Licensed under [MIT][].
-
-[validate]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#validate
 [triggers]: https://github.com/jack-y/seneca-triggers
-[Senecajs org]: https://github.com/senecajs/
-[MIT]: ../LICENSE

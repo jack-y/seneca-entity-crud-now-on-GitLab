@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 e-soa Jacques Desodt */
+/* Copyright (c) 2017-2018 e-soa Jacques Desodt, MIT License */
 'use strict'
 var config = {}
 

@@ -1,4 +1,4 @@
-/* Copyright (c) 2018 e-soa Jacques Desodt */
+/* Copyright (c) 2018 e-soa Jacques Desodt, MIT License */
 'use strict'
 
 /* APPEND PATTERN

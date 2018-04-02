@@ -1,6 +1,6 @@
 # joins feature
 
-Last update: 10/04/2017
+Last update: 04/01/2018
 
 ## Description
 
@@ -79,7 +79,9 @@ The **joins** value is an array of join objects.
 
 You can pass base, zone and name of your entity namespace as optional arguments to override the options.
 
-You can pass an optional `nonamespace: true` argument to remove the namespace of the resulting entity. See the seneca-entity-crud [README file][] for more information..
+You can pass an optional `nonamespace: true` argument to remove the namespace of the resulting entity. See the seneca-entity-crud [README file][] for more information.
+
+Each **joins** object act as a `read` command. You can pass a `appends` value to perform others actions during the read. See the [appends][] feature.
 
 > Note: the `resultname` value is optional.
 
@@ -119,7 +121,7 @@ In the previous example, the full `result.entity` object will be:
 ```
 
 Then we can use `delivery.supplier.name`, `delivery.product.size` and so one.
-Enjoy!
+Enjoy it!
 
 
 ## Recursion
@@ -311,7 +313,7 @@ If you find solutions for more complex situations, I will be happy to share them
 The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.
 
 ## License
-Copyright (c) 2017, Richard Rodger and other contributors.
+Copyright (c) 2017-2018, Richard Rodger and other contributors.
 Licensed under [MIT][].
 
 [MIT]: ../LICENSE
@@ -322,3 +324,4 @@ Licensed under [MIT][].
 [query]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#query
 [this post]: http://microservices.io/patterns/data/database-per-service.html
 [deep select]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#deep-select
+[appends]: https://github.com/jack-y/seneca-entity-crud/blob/master/README-APPENDS.md

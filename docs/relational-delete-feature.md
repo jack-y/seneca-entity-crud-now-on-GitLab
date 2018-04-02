@@ -1,6 +1,6 @@
 # Relational Delete feature
 
-Last update: 07/05/2017
+Last update: 04/02/2018
 
 ## Description
 
@@ -13,13 +13,13 @@ When we develop real applications, we often have to **manage relationships** bet
 How to implement this with [entities][]?
 As a first solution, [seneca mesh][] provides the **model: observe** feature to propagate a delete message to any microservice. But it becomes a pain when there are many levels to manage.
 
-Tadaaa! Here comes the **relational delete** feature.
+Tadaaa! Here comes the **deleterelationships** command.
 
 # How it works
 
 ## When and where to use it
 
-The **relational delete** feature can be used standalone, or coupled with the  [delete][] and [truncate][] actions. In these cases it's a good candidate for [triggers][].
+The **deleterelationships** command can be used standalone, or coupled with the  [delete][] and [truncate][] commands. In these cases it's a good candidate for [triggers][].
 
 ## Define the relationships
 
@@ -108,7 +108,7 @@ To trigger the **relational delete** action, the pattern is:
 ```
 
 - **role**: the primary name of the [message][] that will be published over the network.
-- **cmd**: the fixed name of the command: *deleterelationships*
+- **cmd**: the name of the command: `deleterelationships`
 - **id**: the id of the entity that own relationships to be deleted.
 - **relationships**: the list of the relationships to delete.
 
@@ -125,21 +125,12 @@ The `test/relationships-config.js` file contains an example of the relationships
 
 They are described in this [readme][] file.
 
-# Contributing
-The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.
-
-## License
-Copyright (c) 2017, Richard Rodger and other contributors.
-Licensed under [MIT][].
-
-[MIT]: ../LICENSE
-[Senecajs org]: https://github.com/senecajs/
 [seneca-entity-crud]: https://github.com/jack-y/seneca-entity-crud
-[delete]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#delete
-[truncate]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#truncate
+[delete]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-delete.md
+[truncate]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/truncate.md
 [seneca mesh]: https://github.com/senecajs/seneca-mesh
 [entities]: http://senecajs.org/docs/tutorials/understanding-data-entities.html
 [triggers]: https://github.com/jack-y/seneca-triggers
 [namespace]: http://senecajs.org/docs/tutorials/understanding-data-entities.html#zone-base-and-name-the-entity-namespace
 [message]: http://senecajs.org/getting-started/#how-patterns-work
-[readme]: https://github.com/jack-y/seneca-entity-crud/blob/master/relationships/README-EXAMPLE.md
+[readme]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/relational-delete-example.md

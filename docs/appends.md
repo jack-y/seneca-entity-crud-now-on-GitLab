@@ -1,10 +1,10 @@
 # appends feature
 
-Last update: 02/16/2018
+Last update: 04/02/2018
 
 ## Description
 
-This feature is part of the [seneca-entity-crud][] plugin. It provides more actions results during read or query.
+This feature is part of the [seneca-entity-crud][] plugin. It provides more actions results during [read][] or [query][].
 
 ### Why this feature?
 
@@ -143,15 +143,7 @@ The result of the **append** action will be put in a new field of the origin ent
 - If the `resultname` value **is set**, the new field of the end entity will be named as this `resultname` value.
 - If not set, this field will have the same name as the **role** of the **append** action.
 
-# Contributing
-The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.
-
-## License
-Copyright (c) 2017-2018, Richard Rodger and other contributors.
-Licensed under [MIT][].
-
-[MIT]: ../LICENSE
-[Senecajs org]: https://github.com/senecajs/
 [seneca-entity-crud]: https://github.com/jack-y/seneca-entity-crud
-[read]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#read
-[query]: https://github.com/jack-y/seneca-entity-crud/blob/master/README.md#query
+[read]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-read.md
+[query]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-query.md
+

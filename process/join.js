@@ -1,10 +1,13 @@
-/* Copyright (c) 2018 e-soa Jacques Desodt */
+/* Copyright (c) 2018 e-soa Jacques Desodt, MIT License */
 'use strict'
 
 /* JOIN PATTERN
    joins: [ {role: 'myrole', idname: anIdName, resultname: anotherName }, { ... }, ...]
    See: https://github.com/jack-y/seneca-entity-crud/blob/master/README-JOINS.md
 */
+
+/* Prerequisites */
+const processAppend = require('./append')
 
 var processJoin = {}
 
@@ -84,11 +87,18 @@ processJoin.readOneJoin = function (act, originEntity, join) {
     act({role: join.role, zone: zone, base: base, name: name, cmd: 'read', id: id, joins: join.joins, nonamespace: join.nonamespace})
     .then(function (result) {
       if (result.success) {
-        /* Adds the result to the origin entity */
-        originEntity[fieldname] = result.entity
+        /* Adds the appends data */
+        processAppend.append(act, result.entity, join.appends)
+        .then(function (appendEntity) {
+          /* Adds the result to the origin entity */
+          originEntity[fieldname] = appendEntity
+          return resolve({entity: originEntity})
+        })
+        .catch(function (err) { return reject(err) })
+      } else {
+        /* Success false: returns the unchanged entity */
+        return resolve({entity: originEntity})
       }
-      /* When read is done, returns the full entity */
-      return resolve({entity: originEntity})
     })
     .catch(function (err) { return reject(err) })
   })
