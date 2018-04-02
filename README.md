@@ -293,10 +293,11 @@ Licensed under [MIT][].
 [shortid]: https://cnpmjs.org/package/shortid
 
 [appends]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/appends.md
+[check]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/check.md
 [count]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/count.md
 [create]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-create.md
 [delete]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-delete.md
-[deleterelationqhipq]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/deleterelationships.md
+[deleterelationships]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/deleterelationships.md
 [first]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/first.md
 [joins]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/joins.md
 [query]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/query.md
