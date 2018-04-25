@@ -5,6 +5,7 @@
 const processAppend = require('./append')
 const processDefault = require('./default')
 const processJoin = require('./join')
+const processThen = require('./then')
 
 var processRead = {}
 
@@ -37,8 +38,13 @@ processRead.read = function (seneca, act, options, args, done) {
         /* Adds the appends data */
         processAppend.append(act, entity_2, args.appends)
         .then(function (entity_3) {
-          /* Returns the read entity or success = false */
-          done(null, {success: (entity_3 !== null), entity: entity_3})
+          /* Proceeds the "then" actions */
+          processThen.thenForEntity(act, entity_3, args.then)
+          .then(function (thenResults) {
+            /* Returns the read result with "then" results */
+            return done(null, thenResults)
+          })
+          .catch(function (err) { throw err })
         })
         .catch(function (err) { throw err })
       })

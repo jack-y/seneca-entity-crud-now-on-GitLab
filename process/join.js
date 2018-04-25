@@ -3,7 +3,7 @@
 
 /* JOIN PATTERN
    joins: [ {role: 'myrole', idname: anIdName, resultname: anotherName }, { ... }, ...]
-   See: https://github.com/jack-y/seneca-entity-crud/blob/master/README-JOINS.md
+   See: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/joins.md
 */
 
 /* Prerequisites */

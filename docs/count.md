@@ -1,6 +1,6 @@
 # count
 
-Last update: 04/02/2018
+Last update: 04/24/2018
 
 ## Description
 
@@ -21,7 +21,7 @@ For more information on role, see the [seneca patterns][] guide.
 
 ### filter the list
 
-As the query command, the count command can use `select`, `deepselect` and `selection` filters. See the  [query][] command for more explanations.
+As the [query][] command, the count command can use `select`, `deepselect`, `selection` and `selectioncode` filters. See the [query][] command for more explanations.
 
 ## Result object
 

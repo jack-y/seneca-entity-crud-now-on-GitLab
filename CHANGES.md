@@ -1,10 +1,15 @@
+## 1.7.0 (2018-04-25)
+
+* New `then` feature.
+* New `selectioncode` filter for query and count commands.
+
 ## 1.6.0 (2018-04-02)
 
 * Refactors and updates the documentation in the new directory `docs`.
 * Refactors the scripts and add subscripts to the process directory.
 * Adds the new `first` command.
-* Adds the selection feature to `count`.
-* Adds the appends feature to `joins`.
+* Adds the `selection` feature to the count command.
+* Adds the `appends` feature to the joins.
 * Adds this CHANGES.md file.
 
 ## 1.5.4 (2018-03-19)
@@ -31,7 +36,7 @@
 
 * Adds the selection feature to the `query`.
 
-* Upgrades the versions of the dev dependencies: 
+* Upgrades the versions of the dev dependencies:
 
   `code` 5.1.x
 
@@ -91,4 +96,3 @@
 * Adds the .gitignore and .gitattributes file.
 * Fixes some documentation issues.
 * First commit.
-

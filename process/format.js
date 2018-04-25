@@ -7,7 +7,7 @@ const processSelect = require('./select')
 var processFormat = {}
 
 /* Formats the list: deep select, selection, nonamespace and defaults */
-processFormat.formatList = function (list, deepSelect, selection, nonamespace, defaults) {
+processFormat.formatList = function (list, deepSelect, selection, selectioncode, nonamespace, defaults) {
   /* Initializes */
   var deepList = list
   /* Proceeds the deep selects */
@@ -22,6 +22,17 @@ processFormat.formatList = function (list, deepSelect, selection, nonamespace, d
     var selectionList = []
     for (let i = 0; i < deepList.length; i++) {
       if (selection(deepList[i])) {
+        selectionList.push(deepList[i])
+      }
+    }
+    deepList = selectionList
+  }
+  /* Proceeds the selectioncode code */
+  if (selectioncode && selectioncode.indexOf('item') > -1) {
+    var selectFunction = new Function('item', selectioncode)
+    var selectionList = []
+    for (let i = 0; i < deepList.length; i++) {
+      if (selectFunction(deepList[i])) {
         selectionList.push(deepList[i])
       }
     }

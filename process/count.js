@@ -20,13 +20,14 @@ processCount.count = function (seneca, act, options, args, done) {
   var select = args.select ? args.select : {}
   var deepSelect = args.deepselect ? args.deepselect : []
   var selection = args.selection ? args.selection : null
+  var selectioncode = args.selectioncode ? args.selectioncode : null
   var nonamespace = false
   var defaults = []
   /* Gets the list from the database */
   entityFactory.list$(select, (err, list) => {
     if (err) { throw err }
-    /* Formats: deep select, selection, nonamespace and defaults */
-    var formattedList = processFormat.formatList(list, deepSelect, selection, nonamespace, defaults)
+    /* Formats: deep select, selection, selectioncode, nonamespace and defaults */
+    var formattedList = processFormat.formatList(list, deepSelect, selection, selectioncode, nonamespace, defaults)
     /* Returns the list */
     done(null, {success: true, count: formattedList.length})
   })
