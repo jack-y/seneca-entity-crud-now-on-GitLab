@@ -1,11 +1,11 @@
-/* Copyright (c) 2017 e-soa Jacques Desodt, MIT License */
+/* Copyright (c) 2017-2018 e-soa Jacques Desodt, MIT License */
 'use strict'
 
 /* Default plugin options */
 const role = 'entity-crud-test'
 
 /* Prerequisites */
-const Seneca = require('seneca') // eslint-disable-line no-unused-vars
+const Seneca = require('seneca')
 const testFunctions = require('./functions')
 
 /* Test prerequisites */
@@ -17,16 +17,15 @@ var it = lab.it
 var expect = Code.expect
 
 describe('query', function () {
-  //
-  // Simple
+  /* Simple */
   it('all', function (fin) {
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Creates posts
+    /* Creates the entities */
     testFunctions.createPosts(seneca, role, function (results) {
-      // Retrieves all data
+      /* Fires the test */
       seneca.act({role: role, cmd: 'query'}, function (ignore, result) {
-        // Checks result
+        /* Checks the result */
         expect(result.success).to.equal(true)
         expect(result.list.length).to.equal(testFunctions.getPosts().length)
         expect(result.count).to.equal(testFunctions.getPosts().length)
@@ -34,18 +33,17 @@ describe('query', function () {
       })
     })
   })
-
-  // Select on field
+  /* Select on one field */
   it('select title', function (fin) {
     /* Initializes */
     var title = 'Tuesday'
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Creates posts
+    /* Creates the entities */
     testFunctions.createPosts(seneca, role, function (results) {
-      // Retrieves all data
+      /* Fires the test */
       seneca.act({role: role, cmd: 'query', select: {title: title}}, function (ignore, result) {
-        // Checks result
+        /* Checks the result */
         expect(result.success).to.equal(true)
         expect(result.list.length).to.equal(testFunctions.getTitleCount(title))
         expect(result.count).to.equal(testFunctions.getTitleCount(title))
@@ -53,16 +51,15 @@ describe('query', function () {
       })
     })
   })
-
-  // Sort results
+  /* Sorts the result */
   it('sort', function (fin) {
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Creates posts
+    /* Creates the entities */
     testFunctions.createPosts(seneca, role, function (results) {
-      // Retrieves all data
+      /* Fires the test */
       seneca.act({role: role, cmd: 'query', select: {sort$: {title: 1}}}, function (ignore, result) {
-        // Checks result
+        /* Checks the result */
         expect(result.success).to.equal(true)
         expect(result.list[0].title).to.equal('Life on Mars')
         expect(result.count).to.equal(testFunctions.getPosts().length)
@@ -70,25 +67,24 @@ describe('query', function () {
       })
     })
   })
-
-  // Query with defaults
+  /* Query with defaults */
   it('defaults', function (fin) {
-    // Initializes
+    /* Initializes */
     var author = 'John Deuf'
     var defaultAuthor = 'Mr Nobody'
     var defaultRelease = 2017
     var title = 'Tuesday'
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Creates posts
+    /* Creates the entities */
     testFunctions.createPosts(seneca, role, function (results) {
-      // Retrieves all data
+      /* Fires the test */
       seneca.act({role: role, cmd: 'query', defaults: {author: defaultAuthor, release: defaultRelease}}, function (ignore, result) {
-        // Checks result
+        /* Checks the result */
         expect(result.success).to.equal(true)
         expect(result.list.length).to.equal(testFunctions.getPosts().length)
         expect(result.count).to.equal(testFunctions.getPosts().length)
-        // Checks defaults
+        // Checks the defaults
         result.list.forEach(function (item) {
           expect(item.release).to.equal(defaultRelease)
           if (item.title === title) {
@@ -101,16 +97,15 @@ describe('query', function () {
       })
     })
   })
-
-  // Query with no namespace
+  /* Query with no namespace */
   it('no namespace', function (fin) {
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Creates posts
+    /* Creates the entities */
     testFunctions.createPosts(seneca, role, function (results) {
-      // Retrieves all data
+      /* Fires the test */
       seneca.act({role: role, cmd: 'query', nonamespace: true}, function (ignore, result) {
-        // Checks result
+        /* Checks the result */
         expect(result.success).to.equal(true)
         expect(result.list.length).to.equal(testFunctions.getPosts().length)
         expect(result.count).to.equal(testFunctions.getPosts().length)
@@ -121,34 +116,33 @@ describe('query', function () {
       })
     })
   })
-
-  // Deep query
+  /* Deep query */
   it('deep query', function (fin) {
-    // Initializes
+    /* Initializes */
     var zipcode = '59491'
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Creates posts
+    /* Creates the entities */
     testFunctions.createPosts(seneca, role, function (results) {
-      // Retrieves all data
+      /* Fires the test */
       seneca.act({
         role: role,
         cmd: 'query',
         deepselect: [{ property: 'data.zipcode', value: zipcode }]},
         function (ignore, result) {
-          // Checks result
+          /* Checks the result */
           expect(result.success).to.equal(true)
           expect(result.list.length).to.equal(testFunctions.getZipcodeCount(zipcode))
           expect(result.count).to.equal(testFunctions.getZipcodeCount(zipcode))
-          // Another test which return no data
-          // Retrieves all data
+          /* Another test which return no data.
+             Fires the test */
           seneca.act({
             role: role,
             cmd: 'query',
             select: {title: 'Monday'},
             deepselect: [{property: 'data.zipcode', value: zipcode}]},
             function (ignore, result) {
-              // Checks result
+              /* Checks the result */
               expect(result.success).to.equal(true)
               expect(result.list.length).to.equal(0)
               expect(result.count).to.equal(0)
@@ -157,23 +151,22 @@ describe('query', function () {
         })
     })
   })
-
-  // Query with selection
+  /* Query with selection */
   it('selection', function (fin) {
-    // Sets the expected count
+    /* Initializes */
     var expected = 4
-    // Gets the Seneca instance
+    /* Gets the Seneca instance */
     var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
-    // Creates posts
+    /* Creates the entities */
     testFunctions.createPosts(seneca, role, function (results) {
-      // Sets the selection function
+      /* Sets the selection function */
       var mySelection = function (item) {
         return (item.title.indexOf('day') > -1) ||
           (item.content.indexOf('Maoww') > -1)
       }
-      // Retrieves all data
+      /* Fires the test */
       seneca.act({role: role, cmd: 'query', selection: mySelection}, function (ignore, result) {
-        // Checks result
+        /* Checks the result */
         expect(result.success).to.equal(true)
         expect(result.list.length).to.equal(expected)
         expect(result.count).to.equal(expected)
@@ -181,6 +174,24 @@ describe('query', function () {
       })
     })
   })
-
-  //
+  /* Query with selection code */
+  it('selection code', function (fin) {
+    /* Initializes */
+    var expected = 4
+    /* Gets the Seneca instance */
+    var seneca = testFunctions.setSeneca(Seneca, role, fin) // Add 'print' for debug
+    /* Creates the entities */
+    testFunctions.createPosts(seneca, role, function (results) {
+      /* Sets the selection code */
+      var mySelectionCode = 'return (item.title.indexOf("day") > -1) || (item.content.indexOf("Maoww") > -1)'
+      /* Fires the test */
+      seneca.act({role: role, cmd: 'query', selectioncode: mySelectionCode}, function (ignore, result) {
+        /* Checks the result */
+        expect(result.success).to.equal(true)
+        expect(result.list.length).to.equal(expected)
+        expect(result.count).to.equal(expected)
+        fin()
+      })
+    })
+  })
 })

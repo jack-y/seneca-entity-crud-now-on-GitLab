@@ -1,6 +1,6 @@
 {
   "name": "seneca-entity-crud",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "CRUD standard actions on entities",
   "keywords": [
     "node.js",
@@ -30,7 +30,7 @@
   "author": "Jacques Desodt <jdesodt@e-soa.com>",
   "contributors": [],
   "engines": {
-    "node": ">=5.0.0"
+    "node": ">=6.0.0"
   },
   "main": "entity-crud.js",
   "repository": {

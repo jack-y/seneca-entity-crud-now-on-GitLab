@@ -4,7 +4,7 @@
 
 # seneca-entity-crud
 
-Last update: 04/02/2018
+Last update: 04/24/2018
 
 [![npm version][npm-badge]][npm-url]
 [![Build Status][travis-badge]][travis-url]
@@ -166,7 +166,7 @@ For **the list of the commands** and their arguments, see the chapter below: [AP
 
 # Input data validation
 
-In most cases, it's a best practice to validate input data before insert it in the database. The **seneca-entity-crud** plugin cannot validate input data by itself: it strongly depend on your application data types. However, if you need to proceed input data validation, this plugin can use your prefered function.
+In most cases, it's a best practice to validate input data before insert it in the database. The **seneca-entity-crud** plugin cannot validate input data by itself: it highly depends on your application data types. However, if you need to proceed input data validation, this plugin can use your favorite function.
 
 For more information and examples, please see the [input data validation][] documentation.
 

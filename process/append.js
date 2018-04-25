@@ -3,7 +3,7 @@
 
 /* APPEND PATTERN
    appends: [ {resultname: 'myname', action: {role: aRole, cmd: 'read/query', ...}, select: {idname: anIdName, valuename: aValueName}}, { ... }, ...]
-   See: https://github.com/jack-y/seneca-entity-crud/blob/master/README-APPENDS.md
+   See: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/appends.md
 */
 
 const promise = require('bluebird')

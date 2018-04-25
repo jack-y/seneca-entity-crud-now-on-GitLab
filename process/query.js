@@ -5,6 +5,7 @@
 const processAppend = require('./append')
 const processFormat = require('./format')
 const processJoin = require('./join')
+const processThen = require('./then')
 
 var processQuery = {}
 
@@ -26,6 +27,7 @@ processQuery.query = function (seneca, act, options, args, done) {
   var joins = args.joins ? args.joins : []
   var nonamespace = args.nonamespace || args.nonamespace === 'true'
   var selection = args.selection ? args.selection : null
+  var selectioncode = args.selectioncode ? args.selectioncode : null
   /* Gets the list from the database */
   entityFactory.list$(select, (err, list) => {
     if (err) { throw err }
@@ -34,29 +36,39 @@ processQuery.query = function (seneca, act, options, args, done) {
       /* First: performs the joins */
       processJoin.readJoinsForList(act, list, joins)
       .then(function (result) {
-        /* Formats: deep select, selection, nonamespace and defaults */
-        var formattedList = processFormat.formatList(result.list, deepSelect, selection, nonamespace, defaults)
+        /* Formats: deep select, selection, selectioncode, nonamespace and defaults */
+        var formattedList = processFormat.formatList(result.list, deepSelect, selection, selectioncode, nonamespace, defaults)
         /* Adds the appends data */
         processAppend.readAppendsForList(act, formattedList, args.appends)
         .then(function (appendResult) {
-          /* Returns the query result with appends */
-          return done(null, {success: true, list: appendResult, count: appendResult.length})
+          /* Proceeds the "then" actions */
+          processThen.thenForList(act, appendResult, args.then)
+          .then(function (thenResults) {
+            /* Returns the query result with "then" results */
+            return done(null, thenResults)
+          })
+          .catch(function (err) { throw err })
         })
         .catch(function (err) { throw err })
       })
       .catch(function (err) { throw err })
     } else {
       /* No joins first
-         Formats: deep select, selection, nonamespace and defaults */
-      var formattedList = processFormat.formatList(list, deepSelect, selection, nonamespace, defaults)
+         Formats: deep select, selection, selectioncode, nonamespace and defaults */
+      var formattedList = processFormat.formatList(list, deepSelect, selection, selectioncode, nonamespace, defaults)
       /* Performs the joins */
       processJoin.readJoinsForList(act, formattedList, joins)
       .then(function (result) {
         /* Adds the appends data */
         processAppend.readAppendsForList(act, result.list, args.appends)
         .then(function (appendResult) {
-          /* Returns the query result with appends */
-          return done(null, {success: true, list: appendResult, count: appendResult.length})
+          /* Proceeds the "then" actions */
+          processThen.thenForList(act, appendResult, args.then)
+          .then(function (thenResults) {
+            /* Returns the query result with "then" results */
+            return done(null, thenResults)
+          })
+          .catch(function (err) { throw err })
         })
         .catch(function (err) { throw err })
       })
