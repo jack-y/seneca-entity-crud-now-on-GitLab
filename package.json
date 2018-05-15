@@ -1,6 +1,6 @@
 {
   "name": "seneca-entity-crud",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "CRUD standard actions on entities",
   "keywords": [
     "node.js",
@@ -14,8 +14,9 @@
     "bluebird": "3.x"
   },
   "devDependencies": {
+    "ajv": "6.x",
     "code": "4.1.x",
-    "coveralls": "2.13.x",
+    "coveralls": "3.x",
     "lab": "14.1.x",
     "seneca": "3.x",
     "seneca-basic": "0.5.x",

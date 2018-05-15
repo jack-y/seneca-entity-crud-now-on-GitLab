@@ -4,7 +4,7 @@
 
 # seneca-entity-crud
 
-Last update: 04/24/2018
+Last update: 05/15/2018
 
 [![npm version][npm-badge]][npm-url]
 [![Build Status][travis-badge]][travis-url]
@@ -71,6 +71,7 @@ And we even lie on the floor:
 - A `last_update` date value can be automatically added to each entity when created or updated.
 - The [appends][] feature provides additional actions during read or query.
 - The [joins][] feature provides deep readings from IDs contained in entities.
+- The [then][] feature provides additional processes on entities being read or queried.
 - For security, using the optional `nonamespace: true` argument, the namespace of the resulting entities is automatically removed.
 - Defaults can be added to the resulting entities.
 
@@ -237,14 +238,14 @@ The console output looks like:
 # API commands specifications
 
 * **[check][]**: verify that the store can create-then-delete an entity.
-* **[count][]**: retrieve the count of the entities from your database. 
+* **[count][]**: retrieve the count of the entities from your database.
 * **[create][]**: insert a new entity into your database.
 * **[delete][]**: remove an entity from your database.
 * **[deleterelationships][]**: remove all relationships of an entity from your database.
 * **[first][]**: retrieve from your database the first entity matching filters.
-* **[query][]**: retrieve a list of entities from your database. 
+* **[query][]**: retrieve a list of entities from your database.
 * **[read][]**: retrieve an entity from your database.
-* **[truncate][]**: remove all the entities from your database. 
+* **[truncate][]**: remove all the entities from your database.
 * **[update][]**: update an entity previously created into your database.
 * **[validate][]**: validate your data.
 
@@ -302,6 +303,7 @@ Licensed under [MIT][].
 [joins]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/joins.md
 [query]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/query.md
 [read]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-read.md
+[then]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/then.md
 [truncate]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/truncate.md
 [update]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/crud-update.md
 [validate]: https://github.com/jack-y/seneca-entity-crud/tree/master/docs/validate.md

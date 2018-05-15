@@ -1,3 +1,8 @@
+## 1.7.1 (2018-05-15)
+
+* Updated package.json according to npm audit
+* Updated the readme and `then` feature documentation
+
 ## 1.7.0 (2018-04-25)
 
 * New `then` feature.

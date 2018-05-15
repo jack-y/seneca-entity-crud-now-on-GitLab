@@ -1,10 +1,10 @@
 # *then* feature
 
-Last update: 04/25/2018
+Last update: 05/15/2018
 
 # Description
 
-This feature is part of the [seneca-entity-crud][] plugin. It provides additional treatments on entities being read.
+This feature is part of the [seneca-entity-crud][] plugin. It provides additional processes on entities being read or queried.
 
 ## Why this feature?
 
@@ -34,18 +34,19 @@ With the **then** feature, your code will be:
 ```js
 // Updates the products of the special brand
 act({
-	role: 'product',
-    cmd: 'query',
-    select: { brand: 'Special Brand'},
-    then: {
-		actions: [{
-			role: 'product',
-			cmd: 'update',
-			entity: {
-				id: '%id%',
-				brand_owner: 'John Doo'
-		}]
-	}
+  role: 'product',
+  cmd: 'query',
+  select: { brand: 'Special Brand'},
+  then: {
+    actions: [{
+      role: 'product',
+      cmd: 'update',
+      entity: {
+        id: '%id%',
+        brand_owner: 'John Doo'
+      }
+    }]
+  }
 })
 
 ```
@@ -64,12 +65,12 @@ The pattern is:
 
 ```js
 then: {
-	actions: [ ... ],
-	async: true|false,
-	results: {
-		includes_start: true|false
-    	name: 'a_field_name'
-	}
+  actions: [ ... ],
+  async: true|false,
+  results: {
+    includes_start: true|false
+    name: 'a_field_name'
+  }
 }
 ```
 
@@ -127,12 +128,12 @@ The action is run in silent mode: the result object is `{ success: true }`.
 ```js
 // Data transfer
 act({role: 'product', cmd: 'query', select: {collection: 'old'},
-	then: {
-		actions: [
-			{ role: 'archive', cmd: 'create', entity: '%_entity%' },
-			{ role: 'product', cmd: 'delete', id: '%id%' }
-		]
-	}
+  then: {
+    actions: [
+      { role: 'archive', cmd: 'create', entity: '%_entity%' },
+      { role: 'product', cmd: 'delete', id: '%id%' }
+    ]
+  }
 })
 ```
 
@@ -145,15 +146,15 @@ The result object is the list of the products before the deletion.
 ```js
 // Deletes the marked entities
 act({role: 'product', cmd: 'query', select: {quality: 'poor'},
-	then: {
-		actions: [
-			{ role: 'product', cmd: 'delete', id: '%id%' }
-		],
-        async: true,
-        results: {
-			includes_start: true
-        }
-	}
+  then: {
+    actions: [
+      { role: 'product', cmd: 'delete', id: '%id%' }
+    ],
+    async: true,
+    results: {
+      includes_start: true
+    }
+  }
 })
 ```
 
@@ -171,16 +172,16 @@ The result object is an array containing the entity returned by the `update` com
 ```js
 // Adds a new field
 act({role: 'product', cmd: 'read', id: 'abc',
-	then: {
-		actions: [
-			{ role: 'product', cmd: 'update', entity: {
-				id: '%id%', description: 'This %name% is %color% and costs $%price%'
-			}}
-		],
-        results: {
-			name: updated
-        }
-	}
+  then: {
+    actions: [
+      { role: 'product', cmd: 'update', entity: {
+          id: '%id%', description: 'This %name% is %color% and costs $%price%'
+      }}
+    ],
+    results: {
+      name: updated
+    }
+  }
 })
 ```
 
@@ -203,33 +204,33 @@ After this `read`, your application queries kits from another microservice using
 ```js
 // Query after read
 act({role: 'product', cmd: 'read', id: 'abc',
-    then: {
-		actions: [
-        	{ role: 'addons', cmd: 'query', select: { type: 'kit', color: '%color%' } }
-		],
-        results: {
-        	includes_start: false,
-          	name: 'addons'
-        }
-	}
+  then: {
+    actions: [
+      { role: 'addons', cmd: 'query', select: { type: 'kit', color: '%color%' } }
+    ],
+    results: {
+      includes_start: false,
+      name: 'addons'
+    }
+  }
 })
 ```
 
 The result object will be like:
 
 ```js
-{ 
-  success: true,
-  addons: [
-  	{ id: '123', type: 'kit', name: 'blood kit', color: 'red', price: 3.5 },
-  	{ id: '456', type: 'kit', name: 'patterned bag', color: 'red', price: 4.2 }
-  ]
+{
+    success: true,
+    addons: [
+        { id: '123', type: 'kit', name: 'blood kit', color: 'red', price: 3.5 },
+        { id: '456', type: 'kit', name: 'patterned bag', color: 'red', price: 4.2 }
+    ]
 }
 ```
 
 # Recursion
 
-Each action of  the **then** actions array is a seneca action. So it can be another [read][] or [query][] command with another `then` array inside it. 
+Each action of  the **then** actions array is a seneca action. So it can be another [read][] or [query][] command with another `then` array inside it.
 
 # Contributing
 The [Senecajs org][] encourages open participation. If you feel you can help in any way, be it with documentation, examples, extra testing, or new features please get in touch.
